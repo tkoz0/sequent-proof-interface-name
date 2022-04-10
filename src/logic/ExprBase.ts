@@ -13,8 +13,18 @@ abstract class ExprBase {
     get values() {
         return this._values;
     }
+
+    /**
+     * Convert to a string for display.
+     * @returns string representation
+     */
     public abstract toString(): string;
-    public abstract verify(): ValidType;
+
+    /**
+     * Convert a string to logic expression.
+     * @param s input string
+     * @returns logic expression
+     */
     public static parse(s: string): ExprBase {
         return new ExprAtom("");
     }

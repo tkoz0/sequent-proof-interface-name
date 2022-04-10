@@ -8,9 +8,6 @@ class ExprNot extends ExprBase {
     public toString() {
         return '~' + this.values[0].toString();
     }
-    public verify(): ValidType {
-        return "maybe";
-    }
 }
 
 export default ExprNot;

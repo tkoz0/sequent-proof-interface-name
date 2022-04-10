@@ -14,7 +14,7 @@ function App() {
         <>
             <Header />
             <Menu />
-            <ProofList seqs={[new Sequent("1",new ExprAtom("A"))]} />
+            <ProofList seqs={[new Sequent("1",new ExprAtom("test_expr"),new Proof())]} />
             <Footer />
         </>
     );

@@ -7,20 +7,23 @@ interface Props {
 const Menu: FC<Props> = (): ReactElement => {
     return (
         <div className={"menu"}>
-            <button>
+            <button onClick={() => alert('open')}>
                 Open
             </button>
-            <button>
+            <button onClick={() => alert('save')}>
                 Save
             </button>
-            <button>
+            <button onClick={() => alert('undo')}>
                 Undo
             </button>
-            <button>
+            <button onClick={() => alert('redo')}>
                 Redo
             </button>
-            <button>
+            <button onClick={() => alert('new sequent')}>
                 New Sequent
+            </button>
+            <button onClick={() => alert('check all')}>
+                Check All
             </button>
         </div>
     );

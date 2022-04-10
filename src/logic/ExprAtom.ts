@@ -1,17 +1,17 @@
-import {ValidType} from "../utils/LogicUtils";
+import {REGEX_ATOM} from "../utils/LogicUtils";
 import ExprBase from "./ExprBase";
 
 class ExprAtom extends ExprBase {
     private _label: string;
     constructor(a: string) {
         super([]);
-        this._label = a;
+        if (a.match(REGEX_ATOM))
+            this._label = a;
+        else
+            throw "invalid atom";
     }
     public toString() {
         return this.label;
-    }
-    public verify(): ValidType {
-        return "maybe";
     }
     get label() {
         return this._label;

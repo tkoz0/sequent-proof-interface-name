@@ -8,9 +8,6 @@ class ExprIf extends ExprBase {
     public toString() {
         return '(' + this.values[0].toString() + ' -> ' + this.values[1].toString() + ')';
     }
-    public verify(): ValidType {
-        return "maybe";
-    }
 }
 
 export default ExprIf;
