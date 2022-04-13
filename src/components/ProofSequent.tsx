@@ -12,6 +12,7 @@ interface Props {
 const ProofSequent: FC<Props> = ({seq, delSeq,
                                     moveSeq}: Props): ReactElement => {
     const [val, setVal] = useState(seq);
+    const [editing, setEditing] = useState(false);
     return (
         <tr className={"proofsequent"}>
             <td>
@@ -25,11 +26,15 @@ const ProofSequent: FC<Props> = ({seq, delSeq,
             <td>
                 {val.id}
             </td>
-            <td>
-                {"{"}{val.refs}{"}"}
+            <td className={"seqref"}>
+                {"{"}{val.refs}{"}"} &#8866;
             </td>
             <td>
-                {val.expr && val.expr.toString()}
+                {editing ? <input type="text" readOnly={false}
+                    onChange={ (e) => {
+                        console.log(e);
+                    }} />
+                : val.expr && val.expr.toString()}
             </td>
             <td>
                 <RuleSelector />
@@ -41,14 +46,14 @@ const ProofSequent: FC<Props> = ({seq, delSeq,
                 <input type="text" value={'comment'} readOnly />
             </td>
             <td>
-                <button onClick={() => alert('not implemented')}>
-                    Edit
+                <button onClick={() => setEditing(!editing)}>
+                    {editing ? "Done" : "Edit"}
                 </button>
                 <button onClick={() => alert('not implemented')}>
                     Check
                 </button>
                 <button onClick={() => {
-                    if (!delSeq(seq.id))
+                    if (confirm("Confirm delete sequent?") && !delSeq(seq.id))
                         alert("Error deleting sequent.");
                 }}>
                     Delete

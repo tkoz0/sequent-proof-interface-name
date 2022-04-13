@@ -5,3 +5,7 @@
 .proofsequent td {
     border: 1px solid black;
 }
+
+.seqref {
+    text-align: right;
+}

@@ -18,8 +18,15 @@ type ValidType = "yes" | "no" | "maybe" | "unknown";
 /**
  * Atom names must start with a letter or _ and contain letters, _, and digits.
  */
-let REGEX_ATOM = /^[a-zA-z_][0-9a-zA-z_]+$/;
+let REGEX_ATOM = /[a-zA-z_][0-9a-zA-z_]*/;
+
+let REGEX_ATOM_START = /[a-zA-z_]/;
+
+let REGEX_WHITESPACE = / */;
+
+let REGEX_NONWHITESPACE_CHAR = /[^ ]/;
 
 export type {InferenceRule, ValidType};
 
-export {REGEX_ATOM};
+export {REGEX_ATOM, REGEX_ATOM_START, REGEX_WHITESPACE,
+        REGEX_NONWHITESPACE_CHAR};

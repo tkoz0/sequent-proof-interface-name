@@ -3,3 +3,12 @@
     background: blue;
     text-align: center;
 }
+
+.menu button {
+    margin-right: 10px;
+    background: orange;
+}
+
+.menu:last-child {
+    margin-right: 0;
+}

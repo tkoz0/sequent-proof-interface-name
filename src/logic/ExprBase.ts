@@ -1,4 +1,4 @@
-import ExprAtom from "./ExprAtom";
+import {REGEX_ATOM, REGEX_ATOM_START, REGEX_NONWHITESPACE_CHAR, REGEX_WHITESPACE} from "../utils/LogicUtils";
 
 /**
  * Base class for propositional logic expressions.
@@ -18,15 +18,6 @@ abstract class ExprBase {
      * @returns string representation
      */
     public abstract toString(): string;
-
-    /**
-     * Convert a string to logic expression.
-     * @param s input string
-     * @returns logic expression
-     */
-    public static parse(s: string): ExprBase {
-        return new ExprAtom("");
-    }
 }
 
 export default ExprBase;

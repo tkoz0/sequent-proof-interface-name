@@ -1,5 +1,4 @@
 import React, { ReactElement, FC } from "react";
-import Proof from "../logic/Proof";
 import Sequent from "../logic/Sequent";
 import "./Menu.css";
 
