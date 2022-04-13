@@ -1,3 +1,7 @@
 .proofsequent {
     border: 1px solid black;
 }
+
+.proofsequent td {
+    border: 1px solid black;
+}

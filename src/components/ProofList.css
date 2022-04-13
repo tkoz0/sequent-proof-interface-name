@@ -1,4 +1,13 @@
 .prooflist {
     border: 1px solid black;
     background: yellow;
+    width: 100%;
+}
+
+.prooflist tbody tr th {
+    border: 1px solid black;
+}
+
+.nosequents {
+    text-align: center;
 }

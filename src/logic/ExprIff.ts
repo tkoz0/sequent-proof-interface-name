@@ -1,4 +1,3 @@
-import {ValidType} from "../utils/LogicUtils";
 import ExprBase from "./ExprBase";
 
 class ExprIff extends ExprBase {

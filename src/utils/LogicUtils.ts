@@ -2,8 +2,9 @@
 /**
  * Specifies an inference rule (or none).
  */
-type InferenceRule = null | "notE" | "notI" | "andE" | "andI" | "orE" | "orI"
-                          | "ifE" | "ifI" | "iffE" | "iffI" | "contE" | "contI";
+type InferenceRule = null | "assume" | "notE" | "notI" | "andE" | "andI"
+                          | "orE" | "orI" | "ifE" | "ifI"
+                          | "iffE" | "iffI" | "contE" | "contI";
 
 /**
  * Specifies correctness of a sequent.
@@ -14,7 +15,10 @@ type InferenceRule = null | "notE" | "notI" | "andE" | "andI" | "orE" | "orI"
  */
 type ValidType = "yes" | "no" | "maybe" | "unknown";
 
-let REGEX_ATOM = /^[a-zA-z_][0-9a-zA-z_]*$/;
+/**
+ * Atom names must start with a letter or _ and contain letters, _, and digits.
+ */
+let REGEX_ATOM = /^[a-zA-z_][0-9a-zA-z_]+$/;
 
 export type {InferenceRule, ValidType};
 

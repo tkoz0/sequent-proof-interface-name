@@ -1,8 +1,7 @@
-import {ValidType} from "../utils/LogicUtils";
 import ExprAtom from "./ExprAtom";
 
 /**
- * Base class for logic expressions.
+ * Base class for propositional logic expressions.
  */
 abstract class ExprBase {
     protected _values: Array<ExprBase>;
