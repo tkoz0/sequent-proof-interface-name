@@ -7,6 +7,9 @@ class ExprNot extends ExprBase {
     public toString() {
         return '~' + this.values[0].toString();
     }
+    public toSaveString() {
+        return '(not ' + this.values[0].toSaveString() + ')';
+    }
 }
 
 export default ExprNot;

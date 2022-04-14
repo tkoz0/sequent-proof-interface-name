@@ -2,6 +2,7 @@ import {REGEX_ATOM, REGEX_ATOM_START, REGEX_NONWHITESPACE_CHAR, REGEX_WHITESPACE
 import ExprAnd from "./ExprAnd";
 import ExprAtom from "./ExprAtom";
 import ExprBase from "./ExprBase";
+import ExprCont from "./ExprCont";
 import ExprIf from "./ExprIf";
 import ExprIff from "./ExprIff";
 import ExprNot from "./ExprNot";
@@ -30,32 +31,46 @@ class Parser {
             return [null,s];
         if (char[0] === '(') { // parse connective
             s = s.substring(1); // skip (
+            s = Parser.skipWhitespace(s);
             let token = s.match(REGEX_ATOM);
             // based on token, parse components
             if (token === null)
                 return [null,s];
             s = s.substring(token[0].length);
-            let expr1: ExprBase | null = null;
-            [expr1,s] = Parser.parseHelper(s);
-            if (expr1 === null)
-                return [null,s];
-            if (token[0] === 'not')
-                expr = new ExprNot(expr1);
-            else {
-                let expr2: ExprBase | null = null;
-                [expr2,s] = Parser.parseHelper(s);
-                if (expr2 === null)
+            if (token[0] === 'cont') { // no arguments
+                expr = new ExprCont();
+            } else { // 1 argument
+                let expr1: ExprBase | null = null;
+                [expr1,s] = Parser.parseHelper(s);
+                if (expr1 === null)
                     return [null,s];
-                if (token[0] === 'and')
-                    expr = new ExprAnd(expr1,expr2);
-                else if (token[0] === 'or')
-                    expr = new ExprOr(expr1,expr2);
-                else if (token[0] === 'if')
-                    expr = new ExprIf(expr1,expr2);
-                else if (token[0] === 'iff')
-                    expr = new ExprIff(expr1,expr2);
-                else // invalid connective name
-                    return [null,s];
+                if (token[0] === 'not')
+                    expr = new ExprNot(expr1);
+                else { // 2 arguments
+                    let expr2: ExprBase | null = null;
+                    [expr2,s] = Parser.parseHelper(s);
+                    if (expr2 === null)
+                        return [null,s];
+                    if (token[0] === 'if')
+                        expr = new ExprIf(expr1,expr2);
+                    else if (token[0] === 'iff')
+                        expr = new ExprIff(expr1,expr2);
+                    else { // variable length
+                        let exprs = [expr1,expr2];
+                        for (;;) {
+                            [expr1,s] = Parser.parseHelper(s);
+                            if (expr1 === null)
+                                break;
+                            exprs.push(expr1);
+                        }
+                        if (token[0] === 'and')
+                            expr = new ExprAnd(exprs);
+                        else if (token[0] === 'or')
+                            expr = new ExprOr(exprs);
+                        else
+                            return [null,s];
+                    }
+                }
             }
             s = Parser.skipWhitespace(s);
             char = s.match(REGEX_NONWHITESPACE_CHAR);
@@ -80,6 +95,7 @@ class Parser {
      * expression style used by Slate.
      * TODO extend to support several statements for AND and OR
      * TODO support case insensitivity for connective name
+     * TODO throw better error messages
      * @param a string to parse
      * @returns logic expression or null if invalid
      */

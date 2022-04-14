@@ -1,11 +1,12 @@
 import React, { ReactElement, FC, useState } from "react";
 
 interface Props {
+    editing: boolean
 }
 
-const RuleSelector: FC<Props> = (): ReactElement => {
+const RuleSelector: FC<Props> = ({editing}: Props): ReactElement => {
     return (
-        <select>
+        <select disabled={!editing}>
             <option value="">Rule</option>
             <option value="assume">Assume</option>
             <option value="notE">&not; Elim</option>

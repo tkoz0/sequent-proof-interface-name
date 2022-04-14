@@ -6,6 +6,7 @@ import ProofList from './components/ProofList';
 import "./App.css";
 import Sequent from './logic/Sequent';
 import Parser from './logic/Parser';
+import {ENABLE_PARSER_TEST} from './utils/Constants';
 
 function App() {
     // use a list of sequents
@@ -17,10 +18,12 @@ function App() {
     // for removeSequent, use list slicing
     const [proof, setProof] = useState<Sequent[]>([]);
     const [seqMap, setSeqMap] = useState(new Map<string,number>());
+    const [editing, setEditing] = useState(false);
 
     const clearProof = (): void => {
         setProof([]);
         setSeqMap(new Map<string,number>());
+        setEditing(false);
     };
 
     /**
@@ -81,22 +84,25 @@ function App() {
             <Header />
             <Menu addSeq={addSequent} clearProof={clearProof} />
             <ProofList seqList={proof} delSeq={removeSequent}
-                moveSeq={moveSequent} />
+                moveSeq={moveSequent} editing={editing}
+                setEditing={setEditing} />
             <Footer />
-            <button onClick={() => {
-                let s = prompt("enter a string");
-                if (s === null)
-                    alert("enter a string bitch");
-                else {
-                    let e = Parser.parse(s);
-                    if (e === null)
-                        alert("parse failed");
-                    else
-                        alert(e.toString());
-                }
-            }}>
-                chungus
-            </button>
+            { ENABLE_PARSER_TEST &&
+                <button className={"parsertest"} onClick={() => {
+                    let s = prompt("enter a string");
+                    if (s === null)
+                        alert("you did not enter a string");
+                    else {
+                        let e = Parser.parse(s);
+                        if (e === null)
+                            alert("parse failed");
+                        else
+                            alert(e.toString() + '\n' + e.toSaveString());
+                    }
+                }}>
+                    Test Parser
+                </button>
+            }
         </>
     );
 }

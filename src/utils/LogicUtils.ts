@@ -22,9 +22,9 @@ let REGEX_ATOM = /[a-zA-z_][0-9a-zA-z_]*/;
 
 let REGEX_ATOM_START = /[a-zA-z_]/;
 
-let REGEX_WHITESPACE = / */;
+let REGEX_WHITESPACE = /[ \n\t]*/;
 
-let REGEX_NONWHITESPACE_CHAR = /[^ ]/;
+let REGEX_NONWHITESPACE_CHAR = /[^ \n\t]/;
 
 export type {InferenceRule, ValidType};
 

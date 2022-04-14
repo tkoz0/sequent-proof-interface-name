@@ -38,7 +38,7 @@ const Menu: FC<Props> = ({addSeq, clearProof}: Props): ReactElement => {
                 New Sequent
             </button>
             <button onClick={() => alert('not implemented')}>
-                Check All
+                Check Proof
             </button>
         </div>
     );

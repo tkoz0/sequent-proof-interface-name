@@ -9,3 +9,43 @@
 .seqref {
     text-align: right;
 }
+
+.seqsel {
+    text-align: center;
+}
+
+.donebutton {
+    background: lightblue;
+}
+
+.deletebutton {
+    background: red;
+}
+
+.editbutton {
+    background: yellow;
+}
+
+.checkbutton {
+    background: green;
+}
+
+.seqmove {
+    text-align: center;
+}
+
+.seqid {
+    text-align: center;
+}
+
+.seqvalid {
+    text-align: center;
+}
+
+.seqactions {
+    text-align: center;
+}
+
+.seqrule {
+    text-align: center;
+}

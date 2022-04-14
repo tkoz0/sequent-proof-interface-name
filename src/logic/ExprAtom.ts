@@ -13,6 +13,9 @@ class ExprAtom extends ExprBase {
     public toString() {
         return this.label;
     }
+    public toSaveString() {
+        return this.label;
+    }
     get label() {
         return this._label;
     }

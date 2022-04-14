@@ -18,6 +18,12 @@ abstract class ExprBase {
      * @returns string representation
      */
     public abstract toString(): string;
+
+    /**
+     * Convert to a string for saving. This string can be parsed later.
+     * @returns string for saving the expression
+     */
+    public abstract toSaveString(): string;
 }
 
 export default ExprBase;
