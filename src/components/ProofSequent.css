@@ -6,6 +6,14 @@
     border: 1px solid black;
 }
 
+.proofediting {
+    background: yellow;
+}
+
+.seqselected {
+    background: orange;
+}
+
 .seqref {
     text-align: right;
 }
@@ -27,7 +35,7 @@
 }
 
 .checkbutton {
-    background: green;
+    background: lightgreen;
 }
 
 .seqmove {
