@@ -2,7 +2,7 @@
 /**
  * Specifies an inference rule (or none).
  */
-type InferenceRule = "" | "assume" | "thin"
+type InferenceRule = "" | "assume"
                         | "notE" | "notI"
                         | "andE" | "andI"
                         | "orE" | "orI"

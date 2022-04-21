@@ -14,7 +14,6 @@ const RuleSelector: FC<Props> = ({enabled, value,
             onChange={e => setValue(e.target.value as InferenceRule)}>
             <option value=""></option>
             <option value="assume">Assume</option>
-            <option value="thin">Thin</option>
             <option value="andE">&and; Elim</option>
             <option value="andI">&and; Intro</option>
             <option value="orE">&or; Elim</option>
