@@ -24,17 +24,25 @@ const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
     const [textExpr, setTextExpr] = useState("");
     const [textComment, setTextComment] = useState("");
 
+    const moveMsg = "Sequents may only depend on previous sequents.";
+
     return (
         <tr className={"proofsequent"
                     + (editing === seqData.id ? " proofediting"
                     : (seqCalc.checked ? " seqselected" : ""))}>
             <td className="seqmove">
                 <button disabled={editing !== null}
-                        onClick={() => moveSequent(seqData.id,-1)}>
+                        onClick={() => {
+                            if (!moveSequent(seqData.id,-1))
+                                alert(moveMsg);
+                        }}>
                     &and;
                 </button>
                 <button disabled={editing !== null}
-                        onClick={() => moveSequent(seqData.id,1)}>
+                        onClick={() => {
+                            if (!moveSequent(seqData.id,1))
+                                alert(moveMsg);
+                        }}>
                     &or;
                 </button>
             </td>
@@ -44,8 +52,6 @@ const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
                 : "TODO"}{"}"} &#8872;
             </td>
             <td className="seqexpr">
-{//TODO make background red for invalid and yellow for none
-}
                 {editing === seqData.id ?
                     <textarea defaultValue={textExpr} onChange={e => {
                         setTextExpr(e.target.value);
@@ -73,10 +79,8 @@ const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
                         });
                     }}/>
             </td>
-            <td className="seqvalid">
-{//TODO use green/red background or get x and check icons for this
-}
-                TODO {editing === seqData.id ? seqCalc.valid : seqCalc.valid}
+            <td className={seqCalc.valid === true ? "seqvalid"
+                        : (seqCalc.valid === false ? "seqinvalid" : "")}>
             </td>
             <td className="seqcomment">
                 {editing === seqData.id ?
