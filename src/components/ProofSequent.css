@@ -22,6 +22,14 @@
     text-align: center;
 }
 
+.seqvalid {
+    background: green;
+}
+
+.seqinvalid {
+    background: red;
+}
+
 .donebutton {
     background: lightblue;
 }
@@ -43,10 +51,6 @@
 }
 
 .seqid {
-    text-align: center;
-}
-
-.seqvalid {
     text-align: center;
 }
 
