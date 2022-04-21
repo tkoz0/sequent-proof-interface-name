@@ -2,18 +2,13 @@
 /**
  * Specifies an inference rule (or none).
  */
-type InferenceRule = null | "assume" | "notE" | "notI" | "andE" | "andI"
-                          | "orE" | "orI" | "ifE" | "ifI"
-                          | "iffE" | "iffI" | "contE" | "contI";
-
-/**
- * Specifies correctness of a sequent.
- * yes = correct and all its references are determined to be correct
- * no = incorrect
- * maybe = correct but not all references are determined to be correct
- * unknown = not checked
- */
-type ValidType = "yes" | "no" | "maybe" | "unknown";
+type InferenceRule = "" | "assume" | "thin"
+                        | "notE" | "notI"
+                        | "andE" | "andI"
+                        | "orE" | "orI"
+                        | "ifE" | "ifI"
+                        | "iffE" | "iffI"
+                        | "contE" | "contI";
 
 /**
  * Atom names must start with a letter or _ and contain letters, _, and digits.
@@ -26,7 +21,7 @@ let REGEX_WHITESPACE = /[ \n\t]*/;
 
 let REGEX_NONWHITESPACE_CHAR = /[^ \n\t]/;
 
-export type {InferenceRule, ValidType};
+export type {InferenceRule};
 
 export {REGEX_ATOM, REGEX_ATOM_START, REGEX_WHITESPACE,
         REGEX_NONWHITESPACE_CHAR};

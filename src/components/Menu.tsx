@@ -1,13 +1,15 @@
 import React, { ReactElement, FC } from "react";
-import Sequent from "../logic/Sequent";
+import {SequentData} from "../logic/Sequent";
 import "./Menu.css";
 
 interface Props {
-    addSeq: (s: Sequent) => boolean,
-    clearProof: () => void
+    addSequent: (s: SequentData) => boolean;
+    clearProof: () => void;
+    editing: string | null;
 }
 
-const Menu: FC<Props> = ({addSeq, clearProof}: Props): ReactElement => {
+const Menu: FC<Props> = ({addSequent, clearProof,
+        editing}: Props): ReactElement => {
     return (
         <div className={"menu"}>
             <button onClick={() => alert('not implemented')}>
@@ -30,15 +32,20 @@ const Menu: FC<Props> = ({addSeq, clearProof}: Props): ReactElement => {
             </button>
             <button onClick={() => {
                 const id = prompt("Enter ID:");
-                if (id === null || id.length == 0)
+                if (id === null || id.length === 0)
                     alert("ID cannot be empty.");
-                else if (!addSeq(new Sequent(id)))
-                    alert("Sequent with this ID already exists.");
+                // TODO require ID to only have lettersr, numbers
+                else
+                    addSequent({
+                        comment: "",
+                        expr: null,
+                        id: id,
+                        ref_by: new Set<string>(),
+                        refs: new Set<string>(),
+                        rule: ""
+                    });
             }}>
                 New Sequent
-            </button>
-            <button onClick={() => alert('not implemented')}>
-                Check Proof
             </button>
         </div>
     );

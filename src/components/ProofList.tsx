@@ -1,25 +1,30 @@
 import React, { ReactElement, FC, useState } from "react";
-import Sequent from "../logic/Sequent";
+import {SequentCalc, SequentData} from "../logic/Sequent";
 import "./ProofList.css";
 import ProofSequent from "./ProofSequent";
 
 interface Props {
-    seqList: Sequent[],
-    delSeq: (id: string) => boolean,
-    moveSeq: (id: string, offset: number) => boolean
-    editing: boolean,
-    setEditing: React.Dispatch<React.SetStateAction<boolean>>
+    seqData: SequentData[];
+    seqCalc: Map<string,SequentCalc>;
+    updateData: (id: string, sd: SequentData) => void;
+    updateCalc: (id: string, sc: SequentCalc) => void;
+    removeSequent: (id: string) => boolean;
+    moveSequent: (id: string, offset: number) => boolean;
+    editing: string | null;
+    editSequent: (id: string) => boolean;
+    finishSequent: (id: string, seq: SequentData) => boolean;
 }
 
-const ProofList: FC<Props> = ({seqList, delSeq,
-        moveSeq, editing, setEditing}: Props): ReactElement => {
+const ProofList: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
+        removeSequent, moveSequent, editing,
+        editSequent, finishSequent}: Props): ReactElement => {
     return (
         <table className={"prooflist"}>
             <tbody>
                 <tr>
                     <th>Move</th>
                     <th>ID</th>
-                    <th>References</th>
+                    <th>Assumptions</th>
                     <th>Expression</th>
                     <th>Select</th>
                     <th>Rule</th>
@@ -28,12 +33,16 @@ const ProofList: FC<Props> = ({seqList, delSeq,
                     <th>Actions</th>
                 </tr>
                 {
-                    seqList.length > 0 ?
-                    seqList.map(s =>
-                        <ProofSequent key={s.id} seq={s} delSeq={delSeq}
-                            moveSeq={moveSeq}
-                            proofEditing={editing}
-                            proofSetEditing={setEditing} />)
+                    seqData.length > 0 ?
+                    seqData.map(s =>
+                        <ProofSequent key={s.id} seqData={s}
+                            seqCalc={seqCalc.get(s.id)!}
+                            updateData={(sd) => updateData(s.id,sd)}
+                            updateCalc={(sc) => updateCalc(s.id,sc)}
+                            removeSequent={removeSequent}
+                            moveSequent={moveSequent} editing={editing}
+                            editSequent={editSequent}
+                            finishSequent={finishSequent} />)
                     : <tr><td colSpan={8} className={"nosequents"}>
                         No sequents added yet.</td></tr>
                 }

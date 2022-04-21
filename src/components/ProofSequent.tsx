@@ -1,88 +1,117 @@
 import React, { ReactElement, FC, useState } from "react";
-import Sequent from "../logic/Sequent";
+import {SequentCalc, SequentData} from "../logic/Sequent";
 import RuleSelector from "./RuleSelector";
 import "./ProofSequent.css";
+import Parser from "../logic/Parser";
+import ExprBase from "../logic/ExprBase";
 
 interface Props {
-    seq: Sequent,
-    delSeq: (id: string) => boolean,
-    moveSeq: (id: string, offset: number) => boolean,
-    proofEditing: boolean,
-    proofSetEditing: React.Dispatch<React.SetStateAction<boolean>>
+    seqData: SequentData;
+    seqCalc: SequentCalc;
+    updateData: (sd: SequentData) => void;
+    updateCalc: (sc: SequentCalc) => void;
+    removeSequent: (id: string) => boolean;
+    moveSequent: (id: string, offset: number) => boolean;
+    editing: string | null;
+    editSequent: (id: string) => boolean;
+    finishSequent: (id: string, seq: SequentData) => boolean;
 }
 
-const ProofSequent: FC<Props> = ({seq, delSeq,
-        moveSeq, proofEditing, proofSetEditing}: Props): ReactElement => {
-    const [val, setVal] = useState(seq);
-    const [editing, setEditing] = useState(false);
+const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
+        removeSequent, moveSequent, editing,
+        editSequent, finishSequent}: Props): ReactElement => {
+    // values entered into the text boxes
+    const [textExpr, setTextExpr] = useState("");
+    const [textComment, setTextComment] = useState("");
+
     return (
-        <tr className={"proofsequent"}>
+        <tr className={"proofsequent"
+                    + (editing === seqData.id ? " proofediting"
+                    : (seqCalc.checked ? " seqselected" : ""))}>
             <td className="seqmove">
-                <button onClick={() => moveSeq(seq.id,-1)}>
+                <button disabled={editing !== null}
+                        onClick={() => moveSequent(seqData.id,-1)}>
                     &and;
                 </button>
-                <button onClick={() => moveSeq(seq.id,1)}>
+                <button disabled={editing !== null}
+                        onClick={() => moveSequent(seqData.id,1)}>
                     &or;
                 </button>
             </td>
-            <td className="seqid">
-                {val.id}
-            </td>
+            <td className="seqid">{seqData.id}</td>
             <td className="seqref">
-                {"{"}{val.refs}{"}"} &#8872;
+                {"{"}{editing === seqData.id ? "?"
+                : "TODO"}{"}"} &#8872;
             </td>
             <td className="seqexpr">
-                {editing ? <textarea readOnly={false}
-                    onChange={(e) => {
+                {editing === seqData.id ?
+                    <textarea defaultValue={textExpr} onChange={e => {
+                        setTextExpr(e.target.value);
                     }} />
-                : val.expr && val.expr.toString()}
+                : seqData.expr !== null ? seqData.expr.toString() :
+                    textExpr === "" ? "<none>" : "<invalid>" }
             </td>
             <td className="seqsel">
-                <input type={"checkbox"} disabled={!proofEditing} />
+                <input type={"checkbox"} disabled={!seqCalc.canCheck}
+                    checked={seqCalc.checked}
+                    onChange={() => {
+                        updateCalc({
+                            ...seqCalc,
+                            checked: !seqCalc.checked
+                        });
+                    }} />
             </td>
             <td className="seqrule">
-                {editing ? <RuleSelector editing={editing} />
-                : val.rule }
+                <RuleSelector enabled={editing === seqData.id}
+                    value={editing === seqData.id ? seqData.rule : seqData.rule}
+                    setValue={(rule) => {
+                        updateData({
+                            ...seqData,
+                            rule: rule
+                        });
+                    }}/>
             </td>
             <td className="seqvalid">
-                {val.valid}
+                TODO {editing === seqData.id ? seqCalc.valid : seqCalc.valid}
             </td>
             <td className="seqcomment">
-                {editing ? <textarea readOnly={false}
-                    onChange={(e) => {
+                {editing ?
+                    <textarea defaultValue={textComment} onChange={e => {
+                        setTextComment(e.target.value);
                     }} />
-                : val.comment }
+                : seqData.comment }
             </td>
             <td className="seqactions">
-                <button onClick={() => {
-                    if (editing) {
-                        proofSetEditing(false);
-                        setEditing(false);
-                        // TODO save edits and replace sequent
-                    } else {
-                        if (proofEditing)
-                            alert("Only can edit one sequent at a time.");
-                        else {
-                            proofSetEditing(true);
-                            setEditing(true);
-                            // TODO set current values
+                <button onClick={() => { // done/edit
+                    if (editing === seqData.id) {
+                        let parsed: null | ExprBase = null;
+                        try {
+                            parsed = Parser.parse(textExpr);
+                        } catch (error) {
+                            if (textExpr !== "")
+                                alert("Invalid expression: "+error);
                         }
+                        finishSequent(seqData.id,{
+                            ...seqData,
+                            comment: textComment,
+                            expr: parsed
+                            // finishSequent handles refs, ref_by
+                            // rule is already set by dropdown onChange
+                        });
                     }
-                }} className={editing ? "donebutton" : "editbutton"}>
-                    {editing ? "Done" : "Edit"}
+                    else if (!editSequent(seqData.id))
+                        alert("Please finish editing current sequent.");
+                }}  className={editing === seqData.id ? "donebutton"
+                                                    : "editbutton"}
+                    disabled={editing !== null && editing !== seqData.id}>
+                    {editing === seqData.id ? "Done" : "Edit"}
                 </button>
-                <button className="checkbutton" onClick={() => alert('not implemented')}>
-                    Check
-                </button>
-                <button onClick={() => {
-                    if (!confirm("Confirm delete sequent?"))
+                <button disabled={editing !== null}
+                    onClick={() => { // delete
+                    if (!confirm("Delete this sequent?"))
                         return;
-                    if (!delSeq(seq.id))
+                    if (!removeSequent(seqData.id))
                         alert("Error deleting sequent.");
-                    else if (editing) {
-                        proofSetEditing(false);
-                        setEditing(false);
-                    }
                 }} className="deletebutton">
                     Delete
                 </button>
