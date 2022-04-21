@@ -22,5 +22,5 @@ export type SequentCalc = {
     canCheck: boolean;        // enable/disable the checkbox
     checked: boolean;         // is the checkbox checked
     index: number;            // index in the main sequent list
-    valid: boolean | null;    // is the sequent properly justified
+    valid: boolean;           // is the sequent properly justified
 };

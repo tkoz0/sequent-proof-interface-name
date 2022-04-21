@@ -43,7 +43,7 @@ function App() {
                 ...v,
                 canCheck: v.index < calc.index,
                 checked: data.refs.has(k),
-                valid: null
+                valid: false
             });
         });
         setSeqCalc(newSeqCalc);
@@ -75,19 +75,18 @@ function App() {
                 checked: false
             });
         });
-// TODO update current and reachable sequents
-// - assumptions and valid
         let newSeqData = [...seqData.slice(0,calc.index),
                     {
                         ...seq,
                         refs: newRefs
                     },...seqData.slice(calc.index+1)];
-        newSeqData.forEach(v => {
+        newSeqData.forEach(v => { // update ref_by
             if (newRefs.has(v.id))
                 v.ref_by.add(v.id);
             else
                 v.ref_by.delete(v.id);
         });
+// TODO update current and reachable (assumptions and valid)
         setSeqData(newSeqData);
         setSeqCalc(newSeqCalc);
         setEditing(null);
@@ -131,21 +130,18 @@ function App() {
         else if (editing !== null)
             alert("Please finish editing the current sequent.");
         else {
-            seqCalc.set(s.id,{
+            updateCalc(s.id,{
                 assumptions: new Set<string>(),
                 canCheck: false,
                 checked: false,
                 index: seqData.length,
-                valid: null
+                valid: false
             });
             setSeqData([...seqData,s]);
             return true;
         }
         return false;
     };
-
-// TODO must update those referencing it
-// find all reachable (ref_by) and update in topsort order
 
     /**
      * Removes a sequent from the proof list.
@@ -160,7 +156,6 @@ function App() {
             finishSequent(id,seqData[calc.index]);
         let newSeqData = [...seqData.slice(0,calc.index),
                         ...seqData.slice(calc.index+1)];
-        setSeqData(newSeqData);
         const newSeqCalc = new Map<string,SequentCalc>();
         seqCalc.forEach((v,k) => newSeqCalc.set(k,v));
         newSeqCalc.delete(id);
@@ -168,31 +163,35 @@ function App() {
             const calc2 = newSeqCalc.get(v.id);
             if (calc2 === undefined) // should never happen
                 throw "removeSequent: internal error";
-            if (v.id !== id)
-                newSeqCalc.set(v.id,{
-                    ...calc2,
-                    index: i
-                });
+            newSeqCalc.set(v.id,{
+                ...calc2,
+                index: i
+            });
+            v.refs.delete(id);
+            v.ref_by.delete(id);
         });
+// TODO update reachable in topsort order (change ref_by)
+        setSeqData(newSeqData);
         setSeqCalc(newSeqCalc);
-// TODO update reachable, what if this sequent is editing
         return true;
     };
 
     /**
      * Swaps order of 2 sequents. This is meant to move a sequent up/down.
+     * Returns false if reordering would make a sequent depend on a later one.
      * @param id id of the sequent
      * @param offset offset of sequent to swap with (must be -1 or 1)
-     * @returns true if order has changed
+     * @returns false if swap is not allowed
      */
     const moveSequent = (id: string, offset: number): boolean => {
-        const calc1 = seqCalc.get(id);
+        let calc1 = seqCalc.get(id);
         if (calc1 === undefined)
-            return false;
+            return true;
         const i = calc1.index - (offset === 1 ? 0 : 1); // lower index
         if (i === -1 || i === seqData.length-1)
+            return true;
+        if (seqData[i+1].refs.has(seqData[i].id)) // swap not allowed
             return false;
-// TODO do not swap if violating DAG property
         const newSeqCalc = new Map<string,SequentCalc>();
         seqCalc.forEach((v,k) => {
             if (v.index === i)
