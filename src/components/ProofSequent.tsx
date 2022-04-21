@@ -44,6 +44,8 @@ const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
                 : "TODO"}{"}"} &#8872;
             </td>
             <td className="seqexpr">
+{//TODO make background red for invalid and yellow for none
+}
                 {editing === seqData.id ?
                     <textarea defaultValue={textExpr} onChange={e => {
                         setTextExpr(e.target.value);
@@ -72,10 +74,12 @@ const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
                     }}/>
             </td>
             <td className="seqvalid">
+{//TODO use green/red background or get x and check icons for this
+}
                 TODO {editing === seqData.id ? seqCalc.valid : seqCalc.valid}
             </td>
             <td className="seqcomment">
-                {editing ?
+                {editing === seqData.id ?
                     <textarea defaultValue={textComment} onChange={e => {
                         setTextComment(e.target.value);
                     }} />
