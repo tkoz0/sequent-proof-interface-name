@@ -24,17 +24,20 @@ const Menu: FC<Props> = ({addSequent, clearProof,
             }}>
                 New Proof
             </button>
+            {/*
             <button onClick={() => alert('not implemented')}>
                 Undo
             </button>
             <button onClick={() => alert('not implemented')}>
                 Redo
             </button>
+            */}
             <button onClick={() => {
                 const id = prompt("Enter ID:");
                 if (id === null || id.length === 0)
                     alert("ID cannot be empty.");
-                // TODO require ID to only have lettersr, numbers
+                else if (!id.match(/^[0-9A-za-z_\-]+$/))
+                    alert("ID can only contain letters, numbers, '_' and '-'.");
                 else
                     addSequent({
                         comment: "",
