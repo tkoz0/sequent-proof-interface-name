@@ -26,6 +26,12 @@ const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
 
     const moveMsg = "Sequents may only depend on previous sequents.";
 
+    const assumumptionString = (ids: Set<string>): string => {
+        const idlist: string[] = [];
+        ids.forEach(s => idlist.push(s));
+        return idlist.join(",");
+    }
+
     return (
         <tr className={"proofsequent"
                     + (editing === seqData.id ? " proofediting"
@@ -49,7 +55,7 @@ const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
             <td className="seqid">{seqData.id}</td>
             <td className="seqref">
                 {"{"}{editing === seqData.id ? "?"
-                : "TODO"}{"}"} &#8872;
+                : assumumptionString(seqCalc.assumptions)}{"}"} &#8872;
             </td>
             <td className="seqexpr">
                 {editing === seqData.id ?
@@ -79,8 +85,9 @@ const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
                         });
                     }}/>
             </td>
-            <td className={seqCalc.valid === true ? "seqvalid"
-                        : (seqCalc.valid === false ? "seqinvalid" : "")}>
+            <td className={editing === seqData.id ? "" :
+                        (seqCalc.valid === true ? "seqvalid"
+                        : (seqCalc.valid === false ? "seqinvalid" : ""))}>
             </td>
             <td className="seqcomment">
                 {editing === seqData.id ?

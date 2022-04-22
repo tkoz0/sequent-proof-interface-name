@@ -7,6 +7,7 @@ import "./App.css";
 import {SequentData, SequentCalc} from './logic/Sequent';
 import {ENABLE_PARSER_TEST} from './utils/Constants';
 import ParserTestButton from './components/ParserTestButton';
+import Justification from './logic/Justification';
 
 function App() {
     // list of sequents representing the proof
@@ -42,8 +43,7 @@ function App() {
             newSeqCalc.set(k,{
                 ...v,
                 canCheck: v.index < calc.index,
-                checked: data.refs.has(k),
-                valid: false
+                checked: data.refs.has(k)
             });
         });
         setSeqCalc(newSeqCalc);
@@ -86,7 +86,7 @@ function App() {
             else
                 v.ref_by.delete(v.id);
         });
-// TODO update current and reachable (assumptions and valid)
+        Justification.justify_reachable(id,newSeqData,newSeqCalc);
         setSeqData(newSeqData);
         setSeqCalc(newSeqCalc);
         setEditing(null);
@@ -99,8 +99,8 @@ function App() {
      * @param sd sequent data
      */
     const updateData = (id: string, sd: SequentData): void => {
-        let newSeqData = [...seqData];
-        let calc = seqCalc.get(id);
+        const newSeqData = [...seqData];
+        const calc = seqCalc.get(id);
         if (calc === undefined)
             throw "updateData: nonexistent ID";
         newSeqData[calc.index] = sd;
@@ -113,7 +113,7 @@ function App() {
      * @param sc sequent calculated data
      */
     const updateCalc = (id: string, sc: SequentCalc): void => {
-        let newSeqCalc = new Map<string,SequentCalc>();
+        const newSeqCalc = new Map<string,SequentCalc>();
         seqCalc.forEach((v,k) => newSeqCalc.set(k,v));
         newSeqCalc.set(id,sc);
         setSeqCalc(newSeqCalc);
@@ -154,7 +154,8 @@ function App() {
             return false;
         if (editing === id)
             finishSequent(id,seqData[calc.index]);
-        let newSeqData = [...seqData.slice(0,calc.index),
+        const toUpdate = seqData[calc.index].ref_by;
+        const newSeqData = [...seqData.slice(0,calc.index),
                         ...seqData.slice(calc.index+1)];
         const newSeqCalc = new Map<string,SequentCalc>();
         seqCalc.forEach((v,k) => newSeqCalc.set(k,v));
@@ -170,7 +171,8 @@ function App() {
             v.refs.delete(id);
             v.ref_by.delete(id);
         });
-// TODO update reachable in topsort order (change ref_by)
+        toUpdate.forEach(s =>
+            Justification.justify_reachable(s,newSeqData,newSeqCalc));
         setSeqData(newSeqData);
         setSeqCalc(newSeqCalc);
         return true;
@@ -184,7 +186,7 @@ function App() {
      * @returns false if swap is not allowed
      */
     const moveSequent = (id: string, offset: number): boolean => {
-        let calc1 = seqCalc.get(id);
+        const calc1 = seqCalc.get(id);
         if (calc1 === undefined)
             return true;
         const i = calc1.index - (offset === 1 ? 0 : 1); // lower index
