@@ -1,3 +1,4 @@
+import {SequentCalc, SequentData} from "../logic/Sequent";
 
 /**
  * Specifies an inference rule (or none).
@@ -21,7 +22,21 @@ const REGEX_WHITESPACE = /[ \n\t]*/;
 
 const REGEX_NONWHITESPACE_CHAR = /[^ \n\t]/;
 
+const getSequent = (id: string, data: SequentData[],
+        calc: Map<string,SequentCalc>): [SequentData,SequentCalc] => {
+    const idCalc = calc.get(id);
+    if (idCalc === undefined)
+        throw "getSequent: invalid ID";
+    return [data[idCalc.index],idCalc];
+};
+
+const setToList = <T>(s: Set<T>): T[] => {
+    const ret: T[] = [];
+    s.forEach(v => ret.push(v));
+    return ret;
+};
+
 export type {InferenceRule};
 
 export {REGEX_ATOM, REGEX_ATOM_START, REGEX_WHITESPACE,
-        REGEX_NONWHITESPACE_CHAR};
+        REGEX_NONWHITESPACE_CHAR, getSequent, setToList};
