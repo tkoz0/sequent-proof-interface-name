@@ -82,9 +82,9 @@ function App() {
                     },...seqData.slice(calc.index+1)];
         newSeqData.forEach(v => { // update ref_by
             if (newRefs.has(v.id))
-                v.ref_by.add(v.id);
+                v.ref_by.add(id);
             else
-                v.ref_by.delete(v.id);
+                v.ref_by.delete(id);
         });
         Justification.justify_reachable(id,newSeqData,newSeqCalc);
         setSeqData(newSeqData);
