@@ -1,5 +1,8 @@
 import ExprBase from "./ExprBase";
 
+/**
+ * Representation of the IF connective.
+ */
 class ExprIf extends ExprBase {
     constructor(a: ExprBase, b: ExprBase) {
         super([a,b]);

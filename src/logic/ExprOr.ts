@@ -1,5 +1,8 @@
 import ExprBase from "./ExprBase";
 
+/**
+ * Representation of the OR connective. Needs >= 2 expressions.
+ */
 class ExprOr extends ExprBase {
     constructor(a: ExprBase[]) {
         if (a.length < 2)

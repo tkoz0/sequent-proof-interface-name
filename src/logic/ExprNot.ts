@@ -1,5 +1,8 @@
 import ExprBase from "./ExprBase";
 
+/**
+ * Representation of the NOT operator.
+ */
 class ExprNot extends ExprBase {
     constructor(a: ExprBase) {
         super([a]);

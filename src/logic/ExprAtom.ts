@@ -1,6 +1,9 @@
 import {REGEX_ATOM} from "../utils/LogicUtils";
 import ExprBase from "./ExprBase";
 
+/**
+ * Representation of an atom (single variable).
+ */
 class ExprAtom extends ExprBase {
     private _label: string;
     constructor(a: string) {

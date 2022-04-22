@@ -1,5 +1,8 @@
 import ExprBase from "./ExprBase";
 
+/**
+ * Representation of the contradiction symbol.
+ */
 class ExprCont extends ExprBase {
     constructor() {
         super([]);

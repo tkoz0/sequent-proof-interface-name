@@ -1,5 +1,8 @@
 import ExprBase from "./ExprBase";
 
+/**
+ * Representation of the AND connective. Needs >= 2 expressions.
+ */
 class ExprAnd extends ExprBase {
     constructor(a: ExprBase[]) {
         if (a.length < 2)
