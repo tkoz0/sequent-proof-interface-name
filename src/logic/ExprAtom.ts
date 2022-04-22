@@ -19,6 +19,9 @@ class ExprAtom extends ExprBase {
     get label() {
         return this._label;
     }
+    public equals(a: ExprBase): boolean {
+        return (a instanceof ExprAtom) && this.label === a.label;
+    }
 }
 
 export default ExprAtom;

@@ -10,6 +10,9 @@ class ExprCont extends ExprBase {
     public toSaveString() {
         return '(cont)';
     }
+    public equals(a: ExprBase): boolean {
+        return (a instanceof ExprCont);
+    }
 }
 
 export default ExprCont;

@@ -1,7 +1,7 @@
 import ExprBase from "./ExprBase";
 
 class ExprAnd extends ExprBase {
-    constructor(a: Array<ExprBase>) {
+    constructor(a: ExprBase[]) {
         if (a.length < 2)
             throw "AND must have >= 2 arguments";
         super(a);
@@ -11,6 +11,10 @@ class ExprAnd extends ExprBase {
     }
     public toSaveString() {
         return '(and ' + this.values.map(e => e.toSaveString()).join(' ') + ')';
+    }
+    public equals(a: ExprBase): boolean {
+        return (a instanceof ExprAnd)
+            && ExprBase.listsEqual(this.values,a.values);
     }
 }
 

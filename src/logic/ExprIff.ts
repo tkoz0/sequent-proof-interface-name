@@ -10,6 +10,10 @@ class ExprIff extends ExprBase {
     public toSaveString() {
         return '(iff ' + this.values[0].toSaveString() + ' ' + this.values[1].toSaveString() + ')';
     }
+    public equals(a: ExprBase): boolean {
+        return (a instanceof ExprIff)
+            && ExprBase.listsEqual(this.values,a.values);
+    }
 }
 
 export default ExprIff;

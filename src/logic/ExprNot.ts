@@ -10,6 +10,10 @@ class ExprNot extends ExprBase {
     public toSaveString() {
         return '(not ' + this.values[0].toSaveString() + ')';
     }
+    public equals(a: ExprBase): boolean {
+        return (a instanceof ExprNot)
+            && ExprBase.listsEqual(this.values,a.values);
+    }
 }
 
 export default ExprNot;
