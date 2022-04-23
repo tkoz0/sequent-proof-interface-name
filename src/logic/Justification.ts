@@ -1,8 +1,11 @@
-import {getSequent, setToList} from "../utils/LogicUtils";
+import {getSequent, indexOfSequent, indexOfSequent2, sameExprs, setToList} from "../utils/LogicUtils";
+import ExprAnd from "./ExprAnd";
 import ExprAny from "./ExprAny";
+import ExprBase from "./ExprBase";
 import ExprCont from "./ExprCont";
 import ExprIf from "./ExprIf";
 import ExprNot from "./ExprNot";
+import ExprOr from "./ExprOr";
 import {SequentCalc, SequentData} from "./Sequent";
 
 class Justification {
@@ -63,14 +66,8 @@ class Justification {
             if (refData.expr.equals(Justification.notIntroCont)
                 && Justification.notIntroPattern.equals(data.expr)) {
                 const refAssumes = setToList(refCalc.assumptions);
-                let index = -1; // index of P
-                refAssumes.forEach((v,i) => {
-                    const [tmpData,_tmpCalc] = getSequent(v,seqData,seqCalc);
-                    if (tmpData.expr === null || data.expr === null)
-                        throw "justifyNotIntro: internal error";
-                    if (tmpData.expr.equals(data.expr.values[0]))
-                        index = i;
-                });
+                const index = indexOfSequent(data.expr.values[0],refAssumes,
+                                                seqData,seqCalc);
                 if (index !== -1) {
                     calc.valid = true;
                     // copy assumptions except P
@@ -85,20 +82,84 @@ class Justification {
         }
     }
 
+    // G:=(and P1 P2 ...) -> G:=Pi (any Pi from P1,P2,...)
     public static justifyAndElim(data: SequentData, calc: SequentCalc,
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
+        if (data.expr === null || data.refs.size !== 1)
+            calc.valid = false;
+        else {
+            const refs = setToList(data.refs);
+            const [refData,refCalc] = getSequent(refs[0],seqData,seqCalc);
+            if (refData.expr === null)
+                throw "justifyAndElim: internal error";
+            if (refData.expr instanceof ExprAnd) {
+                const index = indexOfSequent2(data.expr,refData.expr.values);
+                if (index !== -1) { // found Pi in P1,P2,...
+                    calc.valid = true;
+                    refCalc.assumptions.forEach(s => calc.assumptions.add(s));
+                    return;
+                }
+            }
+            calc.valid = false;
+        }
     }
 
+    // G1:=P1, G2:=P2, ... -> (G1 union G2 union ...):=(and P1 P2 ...)
     public static justifyAndIntro(data: SequentData, calc: SequentCalc,
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
+        if (data.expr === null || data.refs.size !== data.expr.values.length
+            || !(data.expr instanceof ExprAnd))
+            calc.valid = false;
+        else {
+            const refs = setToList(data.refs);
+            const refData: SequentData[] = [];
+            const refCalc: SequentCalc[] = [];
+            refs.forEach(s => {
+                const [tmpData,tmpCalc] = getSequent(s,seqData,seqCalc);
+                refData.push(tmpData);
+                refCalc.push(tmpCalc);
+            });
+            const refExprs: ExprBase[] = [];
+            refData.forEach(v => {
+                if (v.expr === null)
+                    throw "justifyAndIntro: internal error";
+                refExprs.push(v.expr);
+            });
+            if (sameExprs(refExprs,data.expr.values)) {
+                calc.valid = true;
+                refCalc.forEach(v => {
+                    v.assumptions.forEach(s => calc.assumptions.add(s));
+                });
+                return;
+            }
+            calc.valid = false;
+        }
     }
 
     public static justifyOrElim(data: SequentData, calc: SequentCalc,
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
     }
 
+    // G:=Pi -> G:=(or P1 P2 ...) (where Pi is in the P1,P2,...)
     public static justifyOrIntro(data: SequentData, calc: SequentCalc,
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
+        if (data.expr === null || data.refs.size !== 1)
+            calc.valid = false;
+        else {
+            const refs = setToList(data.refs);
+            const [refData,refCalc] = getSequent(refs[0],seqData,seqCalc);
+            if (refData.expr === null)
+                throw "justifyOrIntro: internal error";
+            if (data.expr instanceof ExprOr) {
+                const index = indexOfSequent2(refData.expr,data.expr.values);
+                if (index !== -1) {
+                    calc.valid = true;
+                    refCalc.assumptions.forEach(s => calc.assumptions.add(s));
+                    return;
+                }
+            }
+            calc.valid = false;
+        }
     }
 
     // G1:=P, G2:=(if P Q) -> (G1 union G2):=Q (any P,Q)
