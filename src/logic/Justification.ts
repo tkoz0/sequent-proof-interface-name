@@ -1,5 +1,7 @@
 import {getSequent, setToList} from "../utils/LogicUtils";
 import ExprAny from "./ExprAny";
+import ExprCont from "./ExprCont";
+import ExprIf from "./ExprIf";
 import ExprNot from "./ExprNot";
 import {SequentCalc, SequentData} from "./Sequent";
 
@@ -10,7 +12,7 @@ class Justification {
     // Comment in the form of: Seq1,Seq2,... -> NewSeq
     // Sequents are written as {expr1,expr2,...}:=Expr
 
-    // -> {P}:=P
+    // -> {P}:=P (any P)
     public static justifyAssume(data: SequentData, calc: SequentCalc,
             _seqData: SequentData[], _seqCalc: Map<string,SequentCalc>): void {
         if (data.refs.size > 0)
@@ -21,7 +23,7 @@ class Justification {
         }
     }
 
-    // {G}:=~~P -> {G}:=P
+    // G:=~~P -> G:=P (any P)
     private static notElimPattern = new ExprNot(new ExprNot(new ExprAny()));
     public static justifyNotElim(data: SequentData, calc: SequentCalc,
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
@@ -45,8 +47,42 @@ class Justification {
         }
     }
 
+    // (G union {P}):=(cont) -> G:=(not P)
+    private static notIntroCont = new ExprCont();
+    private static notIntroPattern = new ExprNot(new ExprAny());
     public static justifyNotIntro(data: SequentData, calc: SequentCalc,
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
+        if (data.expr === null || data.refs.size !== 1)
+            calc.valid = false;
+        else {
+            const refs = setToList(data.refs);
+            const [refData,refCalc] = getSequent(refs[0],seqData,seqCalc);
+            if (refData.expr === null)
+                throw "justifyNotIntro: internal error";
+            // ref expr must be contradiction, match expr to not P
+            if (refData.expr.equals(Justification.notIntroCont)
+                && Justification.notIntroPattern.equals(data.expr)) {
+                const refAssumes = setToList(refCalc.assumptions);
+                let index = -1; // index of P
+                refAssumes.forEach((v,i) => {
+                    const [tmpData,_tmpCalc] = getSequent(v,seqData,seqCalc);
+                    if (tmpData.expr === null || data.expr === null)
+                        throw "justifyNotIntro: internal error";
+                    if (tmpData.expr.equals(data.expr.values[0]))
+                        index = i;
+                });
+                if (index !== -1) {
+                    calc.valid = true;
+                    // copy assumptions except P
+                    refAssumes.forEach((v,i) => {
+                        if (i !== index)
+                            calc.assumptions.add(v);
+                    });
+                    return;
+                }
+            }
+            calc.valid = false;
+        }
     }
 
     public static justifyAndElim(data: SequentData, calc: SequentCalc,
@@ -65,8 +101,31 @@ class Justification {
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
     }
 
+    // G1:=P, G2:=(if P Q) -> (G1 union G2):=Q (any P,Q)
+    private static ifElimPattern = new ExprIf(new ExprAny(), new ExprAny());
     public static justifyIfElim(data: SequentData, calc: SequentCalc,
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
+        if (data.expr === null || data.refs.size !== 2)
+            calc.valid = false;
+        else {
+            const refs = setToList(data.refs);
+            const [r1data,r1calc] = getSequent(refs[0],seqData,seqCalc);
+            const [r2data,r2calc] = getSequent(refs[1],seqData,seqCalc);
+            if (r1data.expr === null || r2data.expr === null)
+                throw "justifyIfElim: internal error";
+            if ((Justification.ifElimPattern.equals(r1data.expr)
+                && r1data.expr.values[0].equals(r2data.expr)
+                && r1data.expr.values[1].equals(data.expr))
+                || (Justification.ifElimPattern.equals(r2data.expr)
+                && r2data.expr.values[0].equals(r1data.expr)
+                && r2data.expr.values[1].equals(data.expr))) {
+                calc.valid = true;
+                r1calc.assumptions.forEach(s => calc.assumptions.add(s));
+                r2calc.assumptions.forEach(s => calc.assumptions.add(s));
+                return;
+            }
+            calc.valid = false;
+        }
     }
 
     public static justifyIfIntro(data: SequentData, calc: SequentCalc,
@@ -81,12 +140,49 @@ class Justification {
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
     }
 
+    // G:=(cont) -> G:=P (any P)
+    private static contElimCont = new ExprCont();
     public static justifyContElim(data: SequentData, calc: SequentCalc,
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
+        if (data.refs.size !== 1)
+            calc.valid = false;
+        else {
+            const refs = setToList(data.refs);
+            const [refData,refCalc] = getSequent(refs[0],seqData,seqCalc);
+            if (refData.expr === null)
+                throw "justifyContElim: internal error";
+            if (Justification.contElimCont.equals(refData.expr)) {
+                calc.valid = true;
+                refCalc.assumptions.forEach(s => calc.assumptions.add(s));
+                return;
+            }
+            calc.valid = false;
+        }
     }
 
+    // G1:=P, G2:=(not P) -> (G1 union G2):=(cont) (any P)
+    private static contIntroCont = new ExprCont();
     public static justifyContIntro(data: SequentData, calc: SequentCalc,
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
+        if (data.expr === null || data.refs.size !== 2
+            || !data.expr.equals(Justification.contIntroCont))
+            calc.valid = false;
+        else {
+            const refs = setToList(data.refs);
+            const [r1data,r1calc] = getSequent(refs[0],seqData,seqCalc);
+            const [r2data,r2calc] = getSequent(refs[1],seqData,seqCalc);
+            if (r1data.expr === null || r2data.expr === null)
+                throw "justifyContIntro: internal error";
+            // expressions are ~P,P in either order
+            if (r1data.expr.equals(new ExprNot(r2data.expr))
+                || r2data.expr.equals(new ExprNot(r1data.expr))) {
+                calc.valid = true;
+                r1calc.assumptions.forEach(s => calc.assumptions.add(s));
+                r2calc.assumptions.forEach(s => calc.assumptions.add(s));
+                return;
+            }
+            calc.valid = false;
+        }
     }
 
     /**

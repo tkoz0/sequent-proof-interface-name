@@ -36,7 +36,7 @@ const Menu: FC<Props> = ({addSequent, clearProof,
                 const id = prompt("Enter ID:");
                 if (id === null || id.length === 0)
                     alert("ID cannot be empty.");
-                else if (!id.match(/[0-9A-Za-z_-]+/))
+                else if (!id.match(/^[0-9A-Za-z_-]+$/))
                     alert("ID can only contain letters, numbers, '_' and '-'.");
                 else
                     addSequent({
