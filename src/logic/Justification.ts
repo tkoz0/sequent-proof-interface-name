@@ -189,14 +189,41 @@ class Justification {
         }
     }
 
+    // (G union {P}):=Q -> G:=(if P Q)
+    private static ifIntroPattern = new ExprIf(new ExprAny(), new ExprAny());
     public static justifyIfIntro(data: SequentData, calc: SequentCalc,
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
+        if (data.expr === null || data.refs.size !== 1)
+            calc.valid = false;
+        else {
+            const refs = setToList(data.refs);
+            const [refData,refCalc] = getSequent(refs[0],seqData,seqCalc);
+            if (refData.expr === null)
+                throw "justifyIfIntro: internal error";
+            if (Justification.ifIntroPattern.equals(data.expr)
+                && data.expr.values[1].equals(refData.expr)) {
+                const refAssumes = setToList(refCalc.assumptions);
+                const index = indexOfSequent(data.expr.values[0],refAssumes,
+                                                seqData,seqCalc);
+                if (index !== -1) {
+                    calc.valid = true;
+                    refAssumes.forEach((v,i) => {
+                        if (i !== index)
+                            calc.assumptions.add(v);
+                    });
+                    return;
+                }
+            }
+            calc.valid = false;
+        }
     }
 
+    // G1:=P, G2:=(iff P Q) -> (G1 union G2):=Q
     public static justifyIffElim(data: SequentData, calc: SequentCalc,
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
     }
 
+    // (G1 union {P}):=Q, (G2 union {Q}):=P -> (G1 union G2):=(iff P Q)
     public static justifyIffIntro(data: SequentData, calc: SequentCalc,
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
     }
