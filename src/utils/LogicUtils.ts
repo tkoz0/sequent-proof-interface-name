@@ -22,6 +22,10 @@ const REGEX_NONWHITESPACE_CHAR = /[^ \n\t]/;
  * Compute a bipartite matching for the OR elim rule. The expressions from the
  * main OR must each go to a referencecd sequent having that expression in its
  * assumptions. Uses the Ford-Fulkerson algorithm.
+ * 
+ * This code is largely based on the JavaScript pseudocode on GeeksforGeeks
+ * https://www.geeksforgeeks.org/ford-fulkerson-algorithm-for-maximum-flow-problem/
+ * 
  * @param X expressions from the main OR
  * @param Y referenced sequents to match to
  * @param data main data array

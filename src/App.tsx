@@ -38,7 +38,7 @@ function App() {
     const renameSequent = (oldId: string, newId: string): boolean => {
         if (editing !== null || seqCalc.has(newId) || !seqCalc.has(oldId))
             return false;
-        const [oldData,oldCalc] = getSequent(oldId,seqData,seqCalc);
+        const [_oldData,oldCalc] = getSequent(oldId,seqData,seqCalc);
         const newSeqData = [...seqData];
         const newSeqCalc = new Map<string,SequentCalc>();
         seqCalc.forEach((v,k) => newSeqCalc.set(k,v));
@@ -75,10 +75,7 @@ function App() {
     const editSequent = (id: string): boolean => {
         if (editing !== null)
             return false;
-        const calc = seqCalc.get(id);
-        if (calc === undefined)
-            throw "editSequent: nonexistent ID";
-        const data = seqData[calc.index];
+        const [data,calc] = getSequent(id,seqData,seqCalc);
         const newSeqCalc = new Map<string,SequentCalc>();
         seqCalc.forEach((v,k) => {
             newSeqCalc.set(k,{
@@ -102,9 +99,7 @@ function App() {
     const finishSequent = (id: string, seq: SequentData): boolean => {
         if (editing !== id)
             return false;
-        const calc = seqCalc.get(id);
-        if (calc === undefined)
-            throw "finishSequent: nonexistent ID";
+        const [_data,calc] = getSequent(id,seqData,seqCalc);
         const newSeqCalc = new Map<string,SequentCalc>();
         const newRefs = new Set<string>();
         seqCalc.forEach((v,k) => {
@@ -141,9 +136,7 @@ function App() {
      */
     const updateData = (id: string, sd: SequentData): void => {
         const newSeqData = [...seqData];
-        const calc = seqCalc.get(id);
-        if (calc === undefined)
-            throw "updateData: nonexistent ID";
+        const [_data,calc] = getSequent(id,seqData,seqCalc);
         newSeqData[calc.index] = sd;
         setSeqData(newSeqData);
     };
