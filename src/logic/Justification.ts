@@ -177,7 +177,7 @@ class Justification {
                     if (i !== g)
                         refIds.push(v.id);
                 });
-                const m = bipartiteMatch(data.expr.values,refIds,
+                const m = bipartiteMatch(refExprs[g].values,refIds,
                                             seqData,seqCalc);
                 if (m.length < refExprs[g].values.length)
                     continue; // not all matched
@@ -522,7 +522,7 @@ class Justification {
      */
     public static check_refs(data: SequentData[],
                         calc: Map<string,SequentCalc>) {
-        ;
+// TODO
     }
 }
 

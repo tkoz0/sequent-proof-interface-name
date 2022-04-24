@@ -23,18 +23,69 @@ const REGEX_NONWHITESPACE_CHAR = /[^ \n\t]/;
  * main OR must each go to a referencecd sequent having that expression in its
  * assumptions. Uses the Ford-Fulkerson algorithm.
  * 
- * This code is largely based on the JavaScript pseudocode on GeeksforGeeks
+ * This code is partially based on the JavaScript pseudocode on GeeksforGeeks
  * https://www.geeksforgeeks.org/ford-fulkerson-algorithm-for-maximum-flow-problem/
+ * https://www.geeksforgeeks.org/maximum-bipartite-matching/
  * 
- * @param X expressions from the main OR
- * @param Y referenced sequents to match to
+ * @param L expressions from the main OR
+ * @param R referenced sequents to match to
  * @param data main data array
  * @param calc main calc array
  * @returns a maximum bipartite matching
  */
-const bipartiteMatch = (X: ExprBase[], Y: string[], data: SequentData[],
+const bipartiteMatch = (L: ExprBase[], R: string[], data: SequentData[],
         calc: Map<string,SequentCalc>): [ExprBase,string][] => {
-    return [];
+    // create bipartite graph, graph[i] is the elements of Y it can match to
+    const graph: Set<string>[] = [];
+    L.forEach(expr => { // make its possible match set
+        const ids = new Set<string>();
+        R.forEach(id => { // locate elements for the match set
+            const [_tmpData,tmpCalc] = getSequent(id,data,calc);
+            const index = indexOfSequent(expr, // find in assumptions
+                setToList(tmpCalc.assumptions),data,calc);
+            if (index !== -1)
+                ids.add(id);
+        });
+        graph.push(ids);
+    });
+    // track IDs in R matched to expressions in L by index, -1 if unmatched
+    const matchR: number[] = [];
+    R.forEach(() => matchR.push(-1)); // initially all unmatched
+    // DFS for each expr in L
+    L.forEach((_expr,i) => {
+        const seen: boolean[] = []; // the sequents in R "seen" by expr
+        R.forEach(() => seen.push(false));
+        bpdfs(graph,i,R,seen,matchR);
+    });
+    const ret: [ExprBase,string][] = [];
+    matchR.forEach((v,i) => {
+        if (v !== -1)
+            ret.push([L[v],R[i]]);
+    });
+    return ret;
+};
+
+/**
+ * Helper function for bipartiteMatch(), performs the DFS search for an
+ * augmenting path.
+ * @param graph bipartite graph
+ * @param i index of start vertex
+ * @param seen vertices visited in R
+ * @param matchR index in L matched to element in R
+ */
+const bpdfs = (graph: Set<string>[], i: number, R: string[],
+        seen: boolean[], matchR: number[]): boolean => {
+    for (let j = 0; j < matchR.length; ++j) {
+        // if L[i] can match to R[j] and R[j] not visited
+        if (!graph[i].has(R[j]) || seen[j])
+            continue;
+        seen[j] = true;
+        if (matchR[j] < 0 || bpdfs(graph,matchR[j],R,seen,matchR)) {
+            matchR[j] = i;
+            return true;
+        }
+    }
+    return false;
 };
 
 /**
