@@ -8,6 +8,9 @@ import {SequentData, SequentCalc} from './logic/Sequent';
 import {ENABLE_PARSER_TEST} from './utils/Constants';
 import ParserTestButton from './components/ParserTestButton';
 import Justification from './logic/Justification';
+import {getSequent} from './utils/LogicUtils';
+
+// TODO make function for renaming a sequent ID
 
 function App() {
     // list of sequents representing the proof
@@ -25,6 +28,44 @@ function App() {
         setSeqCalc(new Map<string,SequentCalc>());
         setEditing(null);
     };
+
+    /**
+     * Rename a sequent.
+     * @param oldId existing sequent ID
+     * @param newId new sequent ID
+     * @returns true if the rename was successful
+     */
+    const renameSequent = (oldId: string, newId: string): boolean => {
+        if (editing !== null || seqCalc.has(newId) || !seqCalc.has(oldId))
+            return false;
+        const [oldData,oldCalc] = getSequent(oldId,seqData,seqCalc);
+        const newSeqData = [...seqData];
+        const newSeqCalc = new Map<string,SequentCalc>();
+        seqCalc.forEach((v,k) => newSeqCalc.set(k,v));
+        newSeqCalc.set(newId,oldCalc);
+        newSeqCalc.delete(oldId);
+        newSeqCalc.forEach(v => {
+            if (v.assumptions.has(oldId)) {
+                v.assumptions.delete(oldId);
+                v.assumptions.add(newId);
+            }
+        });
+        newSeqData.forEach(v => {
+            if (v.id === oldId)
+                v.id = newId;
+            if (v.ref_by.has(oldId)) {
+                v.ref_by.delete(oldId);
+                v.ref_by.add(newId);
+            }
+            if (v.refs.has(oldId)) {
+                v.refs.delete(oldId);
+                v.refs.add(newId);
+            }
+        });
+        setSeqData(newSeqData);
+        setSeqCalc(newSeqCalc);
+        return true;
+    }
 
     /**
      * Sets the sequent to editing, only when no sequent is currently editing.
@@ -220,7 +261,8 @@ function App() {
                 updateData={updateData} updateCalc={updateCalc}
                 removeSequent={removeSequent}
                 moveSequent={moveSequent} editing={editing}
-                editSequent={editSequent} finishSequent={finishSequent} />
+                editSequent={editSequent} finishSequent={finishSequent}
+                renameSequent={renameSequent} />
             <Footer />
             {ENABLE_PARSER_TEST && <ParserTestButton />}
         </>

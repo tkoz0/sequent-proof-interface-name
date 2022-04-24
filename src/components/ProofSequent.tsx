@@ -15,11 +15,12 @@ interface Props {
     editing: string | null;
     editSequent: (id: string) => boolean;
     finishSequent: (id: string, seq: SequentData) => boolean;
+    renameSequent: (oldId: string, newId: string) => boolean;
 }
 
 const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
         removeSequent, moveSequent, editing,
-        editSequent, finishSequent}: Props): ReactElement => {
+        editSequent, finishSequent, renameSequent}: Props): ReactElement => {
     // values entered into the text boxes
     const [textExpr, setTextExpr] = useState("");
     const [textComment, setTextComment] = useState("");
@@ -116,10 +117,25 @@ const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
                     }
                     else if (!editSequent(seqData.id))
                         alert("Please finish editing current sequent.");
-                }}  className={editing === seqData.id ? "donebutton"
+                    }}  className={editing === seqData.id ? "donebutton"
                                                     : "editbutton"}
                     disabled={editing !== null && editing !== seqData.id}>
                     {editing === seqData.id ? "Done" : "Edit"}
+                </button>
+                <button disabled={editing !== null}
+                    onClick={() => {
+                        const newId = prompt("Enter new ID:");
+                        if (newId === null)
+                            return;
+                        else if (newId.length === 0)
+                            alert("ID cannot be empty.");
+                        else if (!newId.match(/^[0-9A-Za-z_-]+$/))
+                            alert("ID can only contain letters, numbers,"
+                                    + " '_' and '-'.");
+                        else if (!renameSequent(seqData.id,newId))
+                            alert("Must use a new ID.");
+                    }} className="renamebutton">
+                    Rename
                 </button>
                 <button disabled={editing !== null}
                     onClick={() => { // delete
@@ -127,7 +143,7 @@ const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
                         return;
                     if (!removeSequent(seqData.id))
                         alert("Error deleting sequent.");
-                }} className="deletebutton">
+                    }} className="deletebutton">
                     Delete
                 </button>
             </td>

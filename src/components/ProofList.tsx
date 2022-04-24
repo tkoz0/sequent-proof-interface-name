@@ -13,11 +13,12 @@ interface Props {
     editing: string | null;
     editSequent: (id: string) => boolean;
     finishSequent: (id: string, seq: SequentData) => boolean;
+    renameSequent: (oldId: string, newId: string) => boolean;
 }
 
 const ProofList: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
         removeSequent, moveSequent, editing,
-        editSequent, finishSequent}: Props): ReactElement => {
+        editSequent, finishSequent, renameSequent}: Props): ReactElement => {
     return (
         <table className={"prooflist"}>
             <tbody>
@@ -42,7 +43,8 @@ const ProofList: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
                             removeSequent={removeSequent}
                             moveSequent={moveSequent} editing={editing}
                             editSequent={editSequent}
-                            finishSequent={finishSequent} />)
+                            finishSequent={finishSequent}
+                            renameSequent={renameSequent} />)
                     : <tr><td colSpan={8} className={"nosequents"}>
                         No sequents added yet.</td></tr>
                 }
