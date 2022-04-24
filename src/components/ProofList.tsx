@@ -45,7 +45,7 @@ const ProofList: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
                             editSequent={editSequent}
                             finishSequent={finishSequent}
                             renameSequent={renameSequent} />)
-                    : <tr><td colSpan={8} className={"nosequents"}>
+                    : <tr><td colSpan={9} className={"nosequents"}>
                         No sequents added yet.</td></tr>
                 }
             </tbody>

@@ -65,3 +65,7 @@
 .seqrule {
     text-align: center;
 }
+
+.seqrule input {
+    color: black;
+}

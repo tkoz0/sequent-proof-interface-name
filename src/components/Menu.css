@@ -1,5 +1,5 @@
 .menu {
-    border: 1px solid black;
+    border-top: 1px solid black;
     background: lightblue;
     text-align: center;
 }

@@ -1,11 +1,18 @@
 .prooflist {
-    border: 1px solid black;
-    background: lightgray;
+    background: white;
     width: 100%;
 }
 
 .prooflist tbody tr th {
     border: 1px solid black;
+}
+
+.prooflist tbody tr td {
+    border: 1px solid black;
+}
+
+.prooflist {
+    border-collapse: collapse;
 }
 
 .nosequents {
