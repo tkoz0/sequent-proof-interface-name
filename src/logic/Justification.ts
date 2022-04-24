@@ -1,9 +1,10 @@
-import {getSequent, indexOfSequent, indexOfSequent2, sameExprs, setToList} from "../utils/LogicUtils";
+import {bipartiteMatch, getSequent, indexOfSequent, indexOfSequent2, sameExprs, setToList} from "../utils/LogicUtils";
 import ExprAnd from "./ExprAnd";
 import ExprAny from "./ExprAny";
 import ExprBase from "./ExprBase";
 import ExprCont from "./ExprCont";
 import ExprIf from "./ExprIf";
+import ExprIff from "./ExprIff";
 import ExprNot from "./ExprNot";
 import ExprOr from "./ExprOr";
 import {SequentCalc, SequentData} from "./Sequent";
@@ -114,7 +115,7 @@ class Justification {
             const refs = setToList(data.refs);
             const refData: SequentData[] = [];
             const refCalc: SequentCalc[] = [];
-            refs.forEach(s => {
+            refs.forEach(s => { // get objects for referenced sequents
                 const [tmpData,tmpCalc] = getSequent(s,seqData,seqCalc);
                 refData.push(tmpData);
                 refCalc.push(tmpCalc);
@@ -136,8 +137,70 @@ class Justification {
         }
     }
 
+    // G:=(or P1 P2 ...), (G1 union {P1}):=Q, (G2 union {P2}):=Q, ...
+    // -> (G union G1 union G2 union ...):=Q
     public static justifyOrElim(data: SequentData, calc: SequentCalc,
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
+        if (data.expr === null)
+            calc.valid = false;
+        else {
+            const refs = setToList(data.refs);
+            const refData: SequentData[] = [];
+            const refCalc: SequentCalc[] = [];
+            const refExprs: ExprBase[] = [];
+            refs.forEach(s => { // get objects for referenced sequents
+                const [tmpData,tmpCalc] = getSequent(s,seqData,seqCalc);
+                refData.push(tmpData);
+                refCalc.push(tmpCalc);
+                if (tmpData.expr === null)
+                    throw "justifyOrElim: internal error";
+                refExprs.push(tmpData.expr);
+            });
+            for (let g = 0; g < refs.length; ++g) { // find main OR statement
+                if (!(refExprs[g] instanceof ExprOr))
+                    continue;
+                if (refExprs[g].values.length + 1 !== refExprs.length)
+                    continue; // must match each part of the OR to a sequent
+                // all other refs exprs must be Q
+                let allQ = true;
+                refExprs.forEach((v,i) => {
+                    if (data.expr === null)
+                        throw "justifyOrElim: internal error";
+                    if (i !== g && !data.expr.equals(v))
+                        allQ = false;
+                });
+                if (!allQ)
+                    continue;
+                // match main OR to assumptions of ref indexes i != g
+                const refIds: string[] = [];
+                refData.forEach((v,i) => {
+                    if (i !== g)
+                        refIds.push(v.id);
+                });
+                const m = bipartiteMatch(data.expr.values,refIds,
+                                            seqData,seqCalc);
+                if (m.length < refExprs[g].values.length)
+                    continue; // not all matched
+                m.forEach(v => { // set assumption set
+                    const [tmpExpr,tmpId] = v;
+                    const [_idData,idCalc] = getSequent(tmpId,seqData,seqCalc);
+                    const assumeList = setToList(idCalc.assumptions);
+                    const i = indexOfSequent(tmpExpr,
+                        assumeList,seqData,seqCalc);
+                    if (i === -1)
+                        throw "justifyOrElim: internal error (index)";
+                    // insert assumptions except for the matched expression
+                    assumeList.forEach((v,j) => {
+                        if (j !== i)
+                            calc.assumptions.add(v);
+                    });
+                });
+                refCalc[g].assumptions.forEach(s => calc.assumptions.add(s));
+                calc.valid = true;
+                return;
+            }
+            calc.valid = false;
+        }
     }
 
     // G:=Pi -> G:=(or P1 P2 ...) (where Pi is in the P1,P2,...)
@@ -219,13 +282,76 @@ class Justification {
     }
 
     // G1:=P, G2:=(iff P Q) -> (G1 union G2):=Q
+    private static iffElimPattern = new ExprIff(new ExprAny(), new ExprAny());
     public static justifyIffElim(data: SequentData, calc: SequentCalc,
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
+        if (data.expr === null || data.refs.size !== 2)
+            calc.valid = false;
+        else {
+            const refs = setToList(data.refs);
+            const [r1data,r1calc] = getSequent(refs[0],seqData,seqCalc);
+            const [r2data,r2calc] = getSequent(refs[1],seqData,seqCalc);
+            if (r1data.expr === null || r2data.expr === null)
+                throw "justifyIffElim: internal error";
+            if ((Justification.iffElimPattern.equals(r1data.expr)
+                && sameExprs(r1data.expr.values,[r2data.expr,data.expr]))
+                || (Justification.iffElimPattern.equals(r2data.expr)
+                && sameExprs(r2data.expr.values,[r1data.expr,data.expr]))) {
+                calc.valid = true;
+                r1calc.assumptions.forEach(s => calc.assumptions.add(s));
+                r2calc.assumptions.forEach(s => calc.assumptions.add(s));
+                return;
+            }
+            calc.valid = false;
+        }
     }
 
     // (G1 union {P}):=Q, (G2 union {Q}):=P -> (G1 union G2):=(iff P Q)
+    private static iffIntroPattern = new ExprIff(new ExprAny(), new ExprAny());
     public static justifyIffIntro(data: SequentData, calc: SequentCalc,
             seqData: SequentData[], seqCalc: Map<string,SequentCalc>): void {
+        if (data.expr === null || data.refs.size !== 2)
+            calc.valid = false;
+        else {
+            const refs = setToList(data.refs);
+            const [r1data,r1calc] = getSequent(refs[0],seqData,seqCalc);
+            const [r2data,r2calc] = getSequent(refs[1],seqData,seqCalc);
+            if (r1data.expr === null || r2data.expr === null)
+                throw "justifyIffIntro: internal error";
+            if (Justification.iffIntroPattern.equals(data.expr)) {
+                const r1assumes = setToList(r1calc.assumptions);
+                const r2assumes = setToList(r2calc.assumptions);
+                let i1 = -1;
+                let i2 = -1;
+                if (data.expr.values[0].equals(r1data.expr)
+                    && data.expr.values[1].equals(r2data.expr)) {
+                    i1 = indexOfSequent(data.expr.values[1],
+                        r1assumes,seqData,seqCalc);
+                    i2 = indexOfSequent(data.expr.values[0],
+                        r2assumes,seqData,seqCalc);
+                }
+                if (data.expr.values[0].equals(r2data.expr)
+                    && data.expr.values[1].equals(r1data.expr)) {
+                    i1 = indexOfSequent(data.expr.values[0],
+                        r1assumes,seqData,seqCalc);
+                    i2 = indexOfSequent(data.expr.values[1],
+                        r2assumes,seqData,seqCalc);
+                }
+                if (i1 !== -1 && i2 !== -2) {
+                    calc.valid = true;
+                    r1assumes.forEach((v,i) => {
+                        if (i !== i1)
+                            calc.assumptions.add(v);
+                    });
+                    r2assumes.forEach((v,i) => {
+                        if (i !== i2)
+                            calc.assumptions.add(v);
+                    });
+                    return;
+                }
+            }
+            calc.valid = false;
+        }
     }
 
     // G:=(cont) -> G:=P (any P)

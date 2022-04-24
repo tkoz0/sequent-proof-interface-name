@@ -4,13 +4,8 @@ import {SequentCalc, SequentData} from "../logic/Sequent";
 /**
  * Specifies an inference rule (or none).
  */
-type InferenceRule = "" | "assume"
-                        | "notE" | "notI"
-                        | "andE" | "andI"
-                        | "orE" | "orI"
-                        | "ifE" | "ifI"
-                        | "iffE" | "iffI"
-                        | "contE" | "contI";
+type InferenceRule = "" | "assume" | "notE" | "notI" | "andE" | "andI"
+    | "orE" | "orI" | "ifE" | "ifI" | "iffE" | "iffI" | "contE" | "contI";
 
 /**
  * Atom names must start with a letter or _ and contain letters, _, and digits.
@@ -22,6 +17,21 @@ const REGEX_ATOM_START = /[a-zA-z_]/;
 const REGEX_WHITESPACE = /[ \n\t]*/;
 
 const REGEX_NONWHITESPACE_CHAR = /[^ \n\t]/;
+
+/**
+ * Compute a bipartite matching for the OR elim rule. The expressions from the
+ * main OR must each go to a referencecd sequent having that expression in its
+ * assumptions. Uses the Ford-Fulkerson algorithm.
+ * @param X expressions from the main OR
+ * @param Y referenced sequents to match to
+ * @param data main data array
+ * @param calc main calc array
+ * @returns a maximum bipartite matching
+ */
+const bipartiteMatch = (X: ExprBase[], Y: string[], data: SequentData[],
+        calc: Map<string,SequentCalc>): [ExprBase,string][] => {
+    return [];
+};
 
 /**
  * Gets the data and calc objects for a sequent given the ID, assuming that no
@@ -107,5 +117,5 @@ const setToList = <T>(s: Set<T>): T[] => {
 export type {InferenceRule};
 
 export {REGEX_ATOM, REGEX_ATOM_START, REGEX_WHITESPACE,
-        REGEX_NONWHITESPACE_CHAR, getSequent, setToList,
+        REGEX_NONWHITESPACE_CHAR, bipartiteMatch, getSequent, setToList,
         indexOfSequent, indexOfSequent2, sameExprs};
