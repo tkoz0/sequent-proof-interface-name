@@ -10,7 +10,7 @@ class ExprAnd extends ExprBase {
         super(a);
     }
     public toString() {
-        return '(' + this.values.map(e => e.toString()).join(' & ') + ')';
+        return '(' + this.values.map(e => e.toString()).join(' \u2227 ') + ')';
     }
     public toSaveString() {
         return '(and ' + this.values.map(e => e.toSaveString()).join(' ') + ')';

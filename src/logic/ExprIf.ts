@@ -8,10 +8,12 @@ class ExprIf extends ExprBase {
         super([a,b]);
     }
     public toString() {
-        return '(' + this.values[0].toString() + ' -> ' + this.values[1].toString() + ')';
+        return '(' + this.values[0].toString() + ' \u2192 '
+            + this.values[1].toString() + ')';
     }
     public toSaveString() {
-        return '(if ' + this.values[0].toSaveString() + ' ' + this.values[1].toSaveString() + ')';
+        return '(if ' + this.values[0].toSaveString() + ' '
+            + this.values[1].toSaveString() + ')';
     }
     public equals(a: ExprBase): boolean {
         return (a instanceof ExprIf)

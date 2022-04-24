@@ -10,7 +10,7 @@ class ExprOr extends ExprBase {
         super(a);
     }
     public toString() {
-        return '(' + this.values.map(e => e.toString()).join(' | ') + ')';
+        return '(' + this.values.map(e => e.toString()).join(' \u2228 ') + ')';
     }
     public toSaveString() {
         return '(or ' + this.values.map(e => e.toSaveString()).join(' ') + ')';

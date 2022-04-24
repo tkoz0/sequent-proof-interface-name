@@ -8,7 +8,7 @@ class ExprNot extends ExprBase {
         super([a]);
     }
     public toString() {
-        return '~' + this.values[0].toString();
+        return '\u00ac' + this.values[0].toString();
     }
     public toSaveString() {
         return '(not ' + this.values[0].toSaveString() + ')';

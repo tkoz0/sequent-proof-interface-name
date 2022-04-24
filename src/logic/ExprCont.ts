@@ -8,7 +8,7 @@ class ExprCont extends ExprBase {
         super([]);
     }
     public toString() {
-        return '^';
+        return '\u22a5';
     }
     public toSaveString() {
         return '(cont)';
