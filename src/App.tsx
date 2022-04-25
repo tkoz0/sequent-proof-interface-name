@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {v4 as uuid} from 'uuid';
 import Footer from './components/Footer';
 import Header from './components/Header';
@@ -20,6 +20,18 @@ function App() {
     const [seqCalc, setSeqCalc] = useState(new Map<string,SequentCalc>());
     // which sequent is being edited or null
     const [editing, setEditing] = useState<string | null>(null);
+
+    const onUnload = (e: BeforeUnloadEvent) => {
+        e.preventDefault();
+        e.returnValue = "";
+    };
+
+    const cb = useRef(onUnload);
+    useEffect(() => { cb.current = onUnload }, [onUnload]);
+    useEffect(() => {
+        window.addEventListener("beforeunload",onUnload);
+        return () => window.removeEventListener("beforeunload",onUnload);
+    },[]);
 
     /**
      * Resets the proof to a blank list.
