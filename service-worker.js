@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/sequent-proof-interface-name/precache-manifest.168dcca9ea1e866fe3cf073f8a1786cf.js"
+  "/sequent-proof-interface-name/precache-manifest.c14a7591e3df6c5eab4e52d2747aa3e5.js"
 );
 
 workbox.clientsClaim();

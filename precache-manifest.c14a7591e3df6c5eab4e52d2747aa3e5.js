@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "2add28a8e928ce107e31",
+    "revision": "734f6fb1d52627a0efd1",
     "url": "/sequent-proof-interface-name/static/css/main.19f411c2.chunk.css"
   },
   {
-    "revision": "2add28a8e928ce107e31",
-    "url": "/sequent-proof-interface-name/static/js/main.fd47c226.chunk.js"
+    "revision": "734f6fb1d52627a0efd1",
+    "url": "/sequent-proof-interface-name/static/js/main.080be6b0.chunk.js"
   },
   {
     "revision": "f2139edb8f48c18b8178",
@@ -20,7 +20,7 @@ self.__precacheManifest = [
     "url": "/sequent-proof-interface-name/static/js/3.268c5232.chunk.js"
   },
   {
-    "revision": "86194e890f2a52e91ed7c41d5ba3ba4b",
+    "revision": "f12bea3fde636256e0fc8566cc9664f7",
     "url": "/sequent-proof-interface-name/index.html"
   }
 ];
