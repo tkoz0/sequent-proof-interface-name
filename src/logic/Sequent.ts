@@ -8,6 +8,7 @@ import ExprBase from "./ExprBase";
 export type SequentData = {
     comment: string;       // comment text
     expr: ExprBase | null; // expression
+    expr_text: string;     // string input for the expression
     id: string;            // unique nonempty identifier
     ref_by: Set<string>;   // sequents referencing this one
     refs: Set<string>;     // sequents this one references
@@ -23,4 +24,5 @@ export type SequentCalc = {
     checked: boolean;         // is the checkbox checked
     index: number;            // index in the main sequent list
     valid: boolean;           // is the sequent properly justified
+    uuid: string;             // key for react list
 };

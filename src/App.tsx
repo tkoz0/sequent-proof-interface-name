@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {v4 as uuid} from 'uuid';
 import Footer from './components/Footer';
 import Header from './components/Header';
 import Menu from './components/Menu';
@@ -8,9 +9,9 @@ import {SequentData, SequentCalc} from './logic/Sequent';
 import {ENABLE_PARSER_TEST} from './utils/Constants';
 import ParserTestButton from './components/ParserTestButton';
 import Justification from './logic/Justification';
-import {getSequent} from './utils/LogicUtils';
-
-// TODO make function for renaming a sequent ID
+import {getSequent, InferenceRule, setToList} from './utils/LogicUtils';
+import Parser from './logic/Parser';
+import ExprBase from './logic/ExprBase';
 
 function App() {
     // list of sequents representing the proof
@@ -27,6 +28,105 @@ function App() {
         setSeqData([]);
         setSeqCalc(new Map<string,SequentCalc>());
         setEditing(null);
+    };
+
+    /**
+     * Load a proof from file data. If an error occurs, throws an exception.
+     * @param data string representation of the file
+     * @returns true if file data was loaded, false otherwise
+     * @throws except if there is an error parsing the file data
+     */
+    const loadProofFile = (data: string): boolean => {
+        const jsonData = JSON.parse(data);
+        const program = jsonData["program"] as string;
+        const filetype = jsonData["filetype"] as string;
+        const version = jsonData["version"] as number;
+        if (program !== "spin")
+            alert("Warning: program name data is incorrect");
+        if (filetype !== "sequent-propositional")
+            alert("Warning: filetype data is not supported");
+        if (version !== 1)
+            alert("Warning: file version is not supported");
+        const proof = jsonData["proof"]["sequents"] as any[];
+        const newSeqData: SequentData[] = [];
+        const newSeqCalc = new Map<string,SequentCalc>();
+        proof.forEach(obj => {
+            const id = obj["id"] as string;
+            if (newSeqCalc.has(id))
+                throw "loadProofFile: duplicate sequent ID found";
+            const expr = obj["expr"] as string;
+            let expr_val: null | ExprBase = null;
+            try {
+                if (expr !== "")
+                    expr_val = Parser.parse(expr);
+            } catch (err) {
+                throw "loadProofFile: error parsing a sequent";
+            }
+            const expr_text = obj["expr_text"] as string;
+            const rule = obj["rule"] as string as InferenceRule;
+            const refs = obj["refs"] as any[];
+            const comment = obj["comment"] as string;
+            const sequent: SequentData = {
+                comment: comment,
+                expr: expr_val,
+                expr_text: expr_text,
+                id: id,
+                ref_by: new Set<string>(),
+                refs: new Set<string>(),
+                rule: rule
+            };
+            refs.forEach(u => {
+                const v = u as string;
+                if (!newSeqCalc.has(v))
+                    throw "loadProofFile: sequent has invalid reference";
+                sequent.refs.add(v);
+            });
+            newSeqCalc.set(id,{
+                assumptions: new Set<string>(),
+                canCheck: false,
+                checked: false,
+                index: newSeqData.length,
+                valid: false,
+                uuid: uuid()
+            });
+            newSeqData.push(sequent);
+        });
+        newSeqData.forEach(v => { // set ref_by
+            v.refs.forEach(s => {
+                const [tmpData,_tmpCalc] = getSequent(s,newSeqData,newSeqCalc);
+                tmpData.ref_by.add(v.id);
+            });
+        });
+        Justification.justify_all(newSeqData,newSeqCalc);
+        clearProof();
+        setSeqCalc(newSeqCalc);
+        setSeqData(newSeqData);
+        return true;
+    };
+
+    /**
+     * Returns a string representation of the current proof.
+     */
+    const saveProofFile = (): string => {
+        const data = {
+            program: "spin",
+            filetype: "sequent-propositional",
+            version: 1,
+            proof: {
+                sequents: new Array<any>()
+            }
+        };
+        seqData.forEach(seq => {
+            data.proof.sequents.push({
+                id: seq.id,
+                expr: seq.expr === null ? "" : seq.expr.toSaveString(),
+                expr_text: seq.expr_text,
+                rule: seq.rule as string,
+                refs: setToList(seq.refs),
+                comment: seq.comment
+            });
+        });
+        return JSON.stringify(data);
     };
 
     /**
@@ -161,15 +261,14 @@ function App() {
     const addSequent = (s: SequentData): boolean => {
         if (seqCalc.has(s.id))
             alert("Sequent with this ID already exists.");
-        else if (editing !== null)
-            alert("Please finish editing the current sequent.");
         else {
             updateCalc(s.id,{
                 assumptions: new Set<string>(),
                 canCheck: false,
                 checked: false,
                 index: seqData.length,
-                valid: false
+                valid: false,
+                uuid: uuid()
             });
             setSeqData([...seqData,s]);
             return true;
@@ -247,9 +346,9 @@ function App() {
     return (
         <>
             <Header />
-            <Menu addSequent={addSequent}
-                  clearProof={clearProof}
-                  editing={editing} />
+            <Menu addSequent={addSequent} clearProof={clearProof}
+                loadProofFile={loadProofFile} saveProofFile={saveProofFile}
+                editing={editing} />
             <ProofList seqData={seqData} seqCalc={seqCalc}
                 updateData={updateData} updateCalc={updateCalc}
                 removeSequent={removeSequent}

@@ -22,8 +22,9 @@ const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
         removeSequent, moveSequent, editing,
         editSequent, finishSequent, renameSequent}: Props): ReactElement => {
     // values entered into the text boxes
-    const [textExpr, setTextExpr] = useState("");
-    const [textComment, setTextComment] = useState("");
+    const [textExpr, setTextExpr] = useState(seqData.expr_text);
+    const [textComment, setTextComment] = useState(seqData.comment);
+    const [rule, setRule] = useState(seqData.rule);
 
     const moveMsg = "Sequents may only depend on previous sequents.";
 
@@ -78,13 +79,8 @@ const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
             </td>
             <td className="seqrule">
                 <RuleSelector enabled={editing === seqData.id}
-                    value={editing === seqData.id ? seqData.rule : seqData.rule}
-                    setValue={(rule) => {
-                        updateData({
-                            ...seqData,
-                            rule: rule
-                        });
-                    }}/>
+                    value={rule}
+                    setValue={v => setRule(v)}/>
             </td>
             <td className={editing === seqData.id ? "" :
                         (seqCalc.valid === true ? "seqvalid"
@@ -110,9 +106,10 @@ const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
                         finishSequent(seqData.id,{
                             ...seqData,
                             comment: textComment,
-                            expr: parsed
+                            expr: parsed,
+                            expr_text: textExpr,
+                            rule: rule
                             // finishSequent handles refs, ref_by
-                            // rule is already set by dropdown onChange
                         });
                     }
                     else if (!editSequent(seqData.id))
