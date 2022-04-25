@@ -351,10 +351,9 @@ function App() {
                 editing={editing} />
             <ProofList seqData={seqData} seqCalc={seqCalc}
                 updateData={updateData} updateCalc={updateCalc}
-                removeSequent={removeSequent}
-                moveSequent={moveSequent} editing={editing}
-                editSequent={editSequent} finishSequent={finishSequent}
-                renameSequent={renameSequent} />
+                removeSequent={removeSequent} moveSequent={moveSequent}
+                editing={editing} editSequent={editSequent}
+                finishSequent={finishSequent} renameSequent={renameSequent} />
             <Footer />
             {ENABLE_PARSER_TEST && <ParserTestButton />}
         </>
