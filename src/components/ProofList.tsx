@@ -38,7 +38,7 @@ const ProofList: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
                     seqData.map(s =>
                         <ProofSequent key={seqCalc.get(s.id)!.uuid}
                             seqData={s} seqCalc={seqCalc.get(s.id)!}
-                            updateData={(sd) => updateData(s.id,sd)}
+                            //updateData={(sd) => updateData(s.id,sd)}
                             updateCalc={(sc) => updateCalc(s.id,sc)}
                             removeSequent={removeSequent}
                             moveSequent={moveSequent} editing={editing}
