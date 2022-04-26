@@ -8,7 +8,7 @@ import ExprBase from "../logic/ExprBase";
 interface Props {
     seqData: SequentData;
     seqCalc: SequentCalc;
-    updateData: (sd: SequentData) => void;
+    //updateData: (sd: SequentData) => void;
     updateCalc: (sc: SequentCalc) => void;
     removeSequent: (id: string) => boolean;
     moveSequent: (id: string, offset: number) => boolean;
@@ -18,7 +18,7 @@ interface Props {
     renameSequent: (oldId: string, newId: string) => boolean;
 }
 
-const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
+const ProofSequent: FC<Props> = ({seqData, seqCalc, updateCalc,
         removeSequent, moveSequent, editing,
         editSequent, finishSequent, renameSequent}: Props): ReactElement => {
     // values entered into the text boxes
@@ -79,8 +79,7 @@ const ProofSequent: FC<Props> = ({seqData, seqCalc, updateData, updateCalc,
             </td>
             <td className="seqrule">
                 <RuleSelector enabled={editing === seqData.id}
-                    value={rule}
-                    setValue={v => setRule(v)}/>
+                    value={rule} setValue={v => setRule(v)}/>
             </td>
             <td className={editing === seqData.id ? "" :
                         (seqCalc.valid === true ? "seqvalid"

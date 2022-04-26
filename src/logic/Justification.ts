@@ -1,4 +1,5 @@
-import {bipartiteMatch, getSequent, indexOfSequent, indexOfSequent2, sameExprs, setToList} from "../utils/LogicUtils";
+import {bipartiteMatch, getSequent, indexOfSequent, indexOfSequent2,
+    sameExprs, setToList} from "../utils/LogicUtils";
 import ExprAnd from "./ExprAnd";
 import ExprAny from "./ExprAny";
 import ExprBase from "./ExprBase";
@@ -511,18 +512,6 @@ class Justification {
             data[seqCalc.index].ref_by.forEach(s => queue.push(s));
             ++i;
         }
-    }
-
-    /**
-     * Checks validity of the sequent data. Throws an exception if there is a
-     * problem (disallowed sequent reference).
-     * @param data main data array
-     * @param calc main calc array
-     * @throws exception if there is a problem with the data
-     */
-    public static check_refs(data: SequentData[],
-                        calc: Map<string,SequentCalc>) {
-// TODO
     }
 }
 

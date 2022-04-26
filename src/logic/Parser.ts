@@ -1,4 +1,5 @@
-import {REGEX_ATOM, REGEX_ATOM_START, REGEX_NONWHITESPACE_CHAR, REGEX_WHITESPACE} from "../utils/LogicUtils";
+import {REGEX_ATOM, REGEX_ATOM_START, REGEX_NONWHITESPACE_CHAR,
+    REGEX_WHITESPACE} from "../utils/LogicUtils";
 import ExprAnd from "./ExprAnd";
 import ExprAtom from "./ExprAtom";
 import ExprBase from "./ExprBase";

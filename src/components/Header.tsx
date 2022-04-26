@@ -1,5 +1,6 @@
 import React, { ReactElement, FC } from "react";
-import {APP_TITLE_IS_TEMPORARY, APP_TITLE_LONG, APP_TITLE_SHORT} from "../utils/Constants";
+import {APP_TITLE_IS_TEMPORARY, APP_TITLE_LONG,
+    APP_TITLE_SHORT} from "../utils/Constants";
 import "./Header.css";
 
 const Header: FC = (): ReactElement => {
