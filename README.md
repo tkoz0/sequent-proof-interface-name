@@ -3,6 +3,10 @@
 Sequent Proof Interface Name (SPIN) is a React+TypeScript web app for creating
 proofs with propositional logic using the Fitch Sequent System (FSS).
 
+The file `CODE_NOTES.md` contains documentation about the program structure and
+design choices in the code that should be helpful for programmers interested in
+contributing to SPIN or using parts of its code elsewhere.
+
 ## Features
 
 - Create and order a list of propositional logic sequents
@@ -10,7 +14,6 @@ proofs with propositional logic using the Fitch Sequent System (FSS).
 - Open and save proof files
 
 ## Instructions
-
 
 ### Menu
 
@@ -28,7 +31,8 @@ to enter a logic expression and comment in the appropriate text boxes. Use the
 checkboxes in the select column to reference other sequents for deriving a new
 sequent. The justification rule can be selected with the dropdown in the rule
 column. When clicking done, the sequent (and those that depend on it) are
-checked automatically.
+checked automatically. While editing, the sequent is highlighted in yellow.
+Referenced sequents (selected by the checkboxes) are highlighted in orange.
 
 ## Logic Expressions
 
