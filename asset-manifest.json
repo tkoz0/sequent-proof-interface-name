@@ -1,7 +1,7 @@
 {
   "main.css": "/sequent-proof-interface-name/static/css/main.19f411c2.chunk.css",
-  "main.js": "/sequent-proof-interface-name/static/js/main.89ed2ca4.chunk.js",
-  "main.js.map": "/sequent-proof-interface-name/static/js/main.89ed2ca4.chunk.js.map",
+  "main.js": "/sequent-proof-interface-name/static/js/main.b1d39a76.chunk.js",
+  "main.js.map": "/sequent-proof-interface-name/static/js/main.b1d39a76.chunk.js.map",
   "runtime~main.js": "/sequent-proof-interface-name/static/js/runtime~main.2d4288b6.js",
   "runtime~main.js.map": "/sequent-proof-interface-name/static/js/runtime~main.2d4288b6.js.map",
   "static/js/2.dd466389.chunk.js": "/sequent-proof-interface-name/static/js/2.dd466389.chunk.js",
@@ -9,7 +9,7 @@
   "static/js/3.268c5232.chunk.js": "/sequent-proof-interface-name/static/js/3.268c5232.chunk.js",
   "static/js/3.268c5232.chunk.js.map": "/sequent-proof-interface-name/static/js/3.268c5232.chunk.js.map",
   "index.html": "/sequent-proof-interface-name/index.html",
-  "precache-manifest.8710e7ccc38ab4da6965bf1d89d5ed09.js": "/sequent-proof-interface-name/precache-manifest.8710e7ccc38ab4da6965bf1d89d5ed09.js",
+  "precache-manifest.1a81033d31ea9a0f3932464d4b1328d0.js": "/sequent-proof-interface-name/precache-manifest.1a81033d31ea9a0f3932464d4b1328d0.js",
   "service-worker.js": "/sequent-proof-interface-name/service-worker.js",
   "static/css/main.19f411c2.chunk.css.map": "/sequent-proof-interface-name/static/css/main.19f411c2.chunk.css.map"
 }
